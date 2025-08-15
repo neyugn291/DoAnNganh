@@ -16,8 +16,6 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: Demo@123
           MYSQL_DATABASE: studyhubdb
-          MYSQL_USER: root
-          MYSQL_PASSWORD: Demo@123
           MYSQL_HOST: 127.0.0.1
         ports:
           - 3306:3306
