@@ -78,14 +78,16 @@ WSGI_APPLICATION = 'StudyHub.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+import os
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'studyhubdb',
-        'USER': 'root',
-        'PASSWORD': 'Demo@123',
-        'HOST': '',
+        'NAME': os.environ.get('MYSQL_DATABASE', 'studyhubdb'),
+        'USER': os.environ.get('MYSQL_USER', 'root'),
+        'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'Demo@123'),
+        'HOST': os.environ.get('MYSQL_HOST', 'localhost'),
+        'PORT': os.environ.get('MYSQL_PORT', '3306'),
     }
 }
 
