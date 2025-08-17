@@ -29,15 +29,19 @@ class CategoryAdmin(admin.ModelAdmin):
 class CourseAdmin(admin.ModelAdmin):
     list_display = ['id','title','thumbnail_preview','price','category','active','created_at']
     readonly_fields = ['thumbnail_preview']
+    list_filter = ['active', 'category', 'created_at']
+    ordering = ['-created_at']
 
     def thumbnail_preview(self, obj):
         if obj.thumbnail:
-            return mark_safe(f'<img src="{obj.thumbnail.url}" width="160" height="80" />')
+            return mark_safe(f'<img src="{obj.thumbnail.url}" style="max-height:80px; max-width:160px;" />')
         return "(No thumbnail)"
 
 class ModuleAdmin(admin.ModelAdmin):
     list_display = ['id','title', 'order']
 
+class TagAdmin(admin.ModelAdmin):
+    search_fields = ['name']
 
 course_admin_site.register(Category, CategoryAdmin)
 course_admin_site.register(Course, CourseAdmin)
