@@ -36,6 +36,13 @@ class Course(models.Model):
     def __str__(self):
         return self.title
 
+    def save(self, *args, **kwargs):
+        if self.is_free:
+            self.price = 0
+        elif self.price > 0:
+            self.is_free = False
+        super().save(*args, **kwargs)
+
 class Module(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')
     title = models.CharField(max_length=255)
@@ -48,7 +55,7 @@ class Lesson(models.Model):
     module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='lessons')
     title = models.CharField(max_length=255)
     content = models.TextField(blank=True)
-    document = CloudinaryField('file', blank=True, null=True)
+    document = CloudinaryField('file',resource_type="auto", blank=True, null=True)
 
     order = models.PositiveIntegerField(default=0)
 

@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.urls import path, include
 
 from courses.admin import course_admin_site
+from discussions.admin import discuss_admin_site
+from resources.admin import resource_admin_site
 from users.admin import user_admin_site
 
 urlpatterns = [
@@ -26,4 +28,8 @@ urlpatterns = [
     path('course-admin/', course_admin_site.urls),
 
     path('user-admin/', user_admin_site.urls),
+
+    path('discuss-admin/', discuss_admin_site.urls),
+
+    path('resource-admin/', resource_admin_site.urls),
 ]
