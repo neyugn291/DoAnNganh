@@ -3,6 +3,8 @@ from django.contrib.auth import get_user_model
 from courses.models import Tag
 from cloudinary.models import CloudinaryField   # import CloudinaryField
 
+from users.models import BaseModel
+
 User = get_user_model()
 
 
@@ -14,7 +16,7 @@ class Subject(models.Model):
         return self.name
 
 
-class Resource(models.Model):
+class Resource(BaseModel):
     RESOURCE_TYPES = [
         ('PDF', 'PDF Document'),
         ('SLIDE', 'Presentation Slide'),
