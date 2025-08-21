@@ -9,8 +9,7 @@ user_admin_site = UserAppAdminSite(name='user_admin')
 
 
 class UserAdmin(admin.ModelAdmin):
-    pass
-# Register your models here.
+    list_display = ['username','']
 
 
 user_admin_site.register(User)

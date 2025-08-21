@@ -1,5 +1,5 @@
 from django.db import models
-from users.models import User
+from users.models import User, BaseModel
 from django import forms
 from cloudinary.models import CloudinaryField
 # Create your models here.
@@ -17,7 +17,7 @@ class Tag(models.Model):
         return self.name
 
 
-class Course(models.Model):
+class Course(BaseModel):
     title = models.CharField(max_length=255)
     description = models.TextField()
     thumbnail = CloudinaryField('thumbnail', blank=True, null=True)
@@ -27,10 +27,7 @@ class Course(models.Model):
 
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     is_free = models.BooleanField(default=True)
-    active = models.BooleanField(default=True)
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     students = models.ManyToManyField(User, related_name='enrolled_courses', blank=True)
 
     def __str__(self):

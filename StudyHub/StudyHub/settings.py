@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'discussions.apps.DiscussionsConfig',
     'resources.apps.ResourcesConfig',
+    'quizzes.apps.QuizzesConfig',
+    'notifications.apps.NotificationsConfig',
     'rest_framework',
 ]
 

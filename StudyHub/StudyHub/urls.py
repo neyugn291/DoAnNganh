@@ -19,6 +19,8 @@ from django.urls import path, include
 
 from courses.admin import course_admin_site
 from discussions.admin import discuss_admin_site
+from notifications.admin import notification_admin_site
+from quizzes.admin import quizz_admin_site
 from resources.admin import resource_admin_site
 from users.admin import user_admin_site
 
@@ -32,4 +34,8 @@ urlpatterns = [
     path('discuss-admin/', discuss_admin_site.urls),
 
     path('resource-admin/', resource_admin_site.urls),
+
+    path('quizz-admin/', quizz_admin_site.urls),
+
+    path('notification-admin/', notification_admin_site.urls),
 ]
