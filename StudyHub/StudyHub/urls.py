@@ -15,7 +15,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 from courses.admin import course_admin_site
 from discussions.admin import discuss_admin_site
@@ -24,8 +28,36 @@ from quizzes.admin import quizz_admin_site
 from resources.admin import resource_admin_site
 from users.admin import user_admin_site
 
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="StudyHub API",
+        default_version='v1',
+        description="StudyHub API",
+        contact=openapi.Contact(email="2251052074nguyen@ou.edu.vn"),
+        license=openapi.License(name="Duong Hoang Nguyen"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
+
 urlpatterns = [
-    path('', include('courses.urls')),
+    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+
+    path('api/courses/', include('courses.urls')),
+
+    path('api/discussions/', include('discussions.urls')),
+
+    path('api/notifications/', include('notifications.urls')),
+
+    path('api/quizzes/', include('quizzes.urls')),
+
+    path('api/resources/', include('resources.urls')),
 
     path('course-admin/', course_admin_site.urls),
 
@@ -38,4 +70,14 @@ urlpatterns = [
     path('quizz-admin/', quizz_admin_site.urls),
 
     path('notification-admin/', notification_admin_site.urls),
+
+    re_path(r'^swagger(?P<format>\.json|\.yaml)$',
+            schema_view.without_ui(cache_timeout=0),
+            name='schema-json'),
+    re_path(r'^swagger/$',
+            schema_view.with_ui('swagger', cache_timeout=0),
+            name='schema-swagger-ui'),
+    re_path(r'^redoc/$',
+            schema_view.with_ui('redoc', cache_timeout=0),
+            name='schema-redoc'),
 ]

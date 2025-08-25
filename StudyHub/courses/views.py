@@ -10,7 +10,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.CategorySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-class TagViewSet(viewsets.ModelViewSet):
+class TagViewSet(viewsets.ViewSet, generics.ListCreateAPIView):
     queryset = models.Tag.objects.all()
     serializer_class = serializers.TagSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]

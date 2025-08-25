@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'quizzes.apps.QuizzesConfig',
     'notifications.apps.NotificationsConfig',
     'rest_framework',
+    'drf_yasg',
 ]
 
 import pymysql
@@ -149,3 +150,19 @@ cloudinary.config(
     api_key = '591363178267761',
     api_secret = 'wJjEU-Oq-vGf5fWSkbfdQ7pWM00'
 )
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    )
+}
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}
