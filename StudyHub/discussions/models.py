@@ -1,3 +1,5 @@
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.contrib.auth import get_user_model
 from courses.models import Tag
@@ -31,15 +33,16 @@ class Answer(BaseModel):
 
 
 class Comment(BaseModel):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="comments", null=True, blank=True)
-    answer = models.ForeignKey(Answer, on_delete=models.CASCADE, related_name="comments", null=True, blank=True)
-    body = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
+    body = models.TextField()
 
+    # Generic ForeignKey
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey("content_type", "object_id")
 
     def __str__(self):
-        return f"Comment by {self.author}"
-
+        return f"Comment by {self.author} on {self.content_object}"
 
 class Vote(models.Model):
     UPVOTE = 1
@@ -50,12 +53,12 @@ class Vote(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, null=True, blank=True)
-    answer = models.ForeignKey(Answer, on_delete=models.CASCADE, null=True, blank=True)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
     value = models.SmallIntegerField(choices=VALUE_CHOICES)
 
     class Meta:
-        unique_together = ("user", "question", "answer")  # Mỗi user chỉ vote 1 lần
+        unique_together = ("user", "content_type", "object_id")
 
     def __str__(self):
         target = self.question or self.answer

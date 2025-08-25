@@ -60,3 +60,12 @@ class Lesson(models.Model):
         return f"{self.module.title} - {self.title}"
 
 
+# class Interaction(BaseModel):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='interactions')
+#     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='interactions')
+#
+#     class Meta:
+#         abstract = True
+#
+# class Like(Interaction):
+#     active = models.BooleanField(default=True)
