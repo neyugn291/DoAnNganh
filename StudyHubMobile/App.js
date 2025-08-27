@@ -1,20 +1,40 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { useReducer } from 'react';
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { MyUserContext, MyDispatchContext } from "./configs/MyContexts";
 
-export default function App() {
+
+import Login from './components/User/Login';
+import Home from './components/Home/Home';
+
+const MyUserReducer = (state, action) => {
+  switch (action.type) {
+    case "login":
+      return action.payload;
+    case "logout":
+      return null;
+    default:
+      return state;
+  }
+};
+
+const Stack = createNativeStackNavigator();
+
+const App = () => {
+  const [user, dispatch] = useReducer(MyUserReducer, null);
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <MyUserContext.Provider value={user}>
+      <MyDispatchContext.Provider value={dispatch}>
+        <NavigationContainer>
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen name="Home" component={Home} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </MyDispatchContext.Provider>
+    </MyUserContext.Provider>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
