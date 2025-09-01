@@ -25,8 +25,16 @@ class SubmissionViewSet(viewsets.ModelViewSet):
 
 
     def perform_create(self, serializer):
-        # Tự động gắn user hiện tại
-        serializer.save(user=self.request.user)
+        serializer.save()
+
+    @action(detail=False, methods=["get"], permission_classes=[permissions.IsAuthenticated])
+    def my_submissions(self, request):
+        """
+        Lấy tất cả Submission của user hiện tại
+        """
+        subs = self.get_queryset().filter(user=request.user).order_by('-submitted_at')
+        serializer = self.get_serializer(subs, many=True)
+        return Response(serializer.data)
 
     @action(detail=True, methods=["get"], permission_classes=[permissions.IsAuthenticated])
     def result(self, request, pk=None):

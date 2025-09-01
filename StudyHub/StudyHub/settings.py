@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'notifications.apps.NotificationsConfig',
     'rest_framework',
     'drf_yasg',
+    'django_filters',
 ]
 
 import pymysql

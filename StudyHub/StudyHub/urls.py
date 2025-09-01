@@ -32,8 +32,6 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-from users.views import CurrentUserProfileView
-
 schema_view = get_schema_view(
     openapi.Info(
         title="StudyHub API",
@@ -63,8 +61,6 @@ urlpatterns = [
 
     path('api/users/', include('users.urls')),
 
-    path("api/profile/", CurrentUserProfileView.as_view(), name="current-user-profile"),
-
     path('course-admin/', course_admin_site.urls),
 
     path('user-admin/', user_admin_site.urls),
@@ -73,7 +69,7 @@ urlpatterns = [
 
     path('resource-admin/', resource_admin_site.urls),
 
-    path('quizz-admin/', quizz_admin_site.urls),
+    path('quiz-admin/', quizz_admin_site.urls),
 
     path('notification-admin/', notification_admin_site.urls),
 

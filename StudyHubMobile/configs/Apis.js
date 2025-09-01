@@ -4,10 +4,27 @@ const BASE_URL = "http://192.168.120.23:8000/api";
 
 export const endpoints = {
     'categories': '/courses/categories/',
-    'courses': '',
+    'courses': '/courses/courses/',
+    'lessons': '/courses/lessons/',
+
+    'questions': '/discussions/questions/',
+    'answers': '/discussions/answers/',
+    'comments': '/discussions/comments/',
+    'content_types':'/discussions/content_types/',
+    'votes':'/discussions/votes/',
+
+    'resources':'/resources/resources/',
+
+    'quizzes':'/quizzes/quizzes/',
+    'submissions':'/quizzes/submissions/',
+ 
     'currentUser': '/users/users/current/',
-    'login': "/token/",          // endpoint Simple JWT
-    'refresh': "/token/refresh/", // refresh token nếu cần
+    'users':'/users/users/',
+    'profiles':'/users/profiles/',
+    'notifications':'/notifications/notifications/',
+
+    'login': "/token/",
+    'refresh': "/token/refresh/",
 };
 
 export const authApis = (token) => {

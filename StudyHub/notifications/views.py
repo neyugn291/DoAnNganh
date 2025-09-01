@@ -18,14 +18,20 @@ class NotificationViewSet(viewsets.ViewSet, generics.ListAPIView):
         # user nhận thông báo = current user
         serializer.save(user=self.request.user)
 
-    @decorators.action(detail=True, methods=["post"])
+    @decorators.action(detail=True, methods=["get"])
+    def get_detail(self, request, pk=None):
+        notif = self.get_object()
+        serializer = self.get_serializer(notif)
+        return response.Response(serializer.data, status=status.HTTP_200_OK)
+
+    @decorators.action(detail=True, methods=["patch"])
     def mark_read(self, request, pk=None):
         """Đánh dấu 1 thông báo là đã đọc"""
         notif = self.get_object()
         notif.mark_read()
         return response.Response({"status": "marked as read"}, status=status.HTTP_200_OK)
 
-    @decorators.action(detail=False, methods=["post"])
+    @decorators.action(detail=False, methods=["patch"])
     def mark_all_read(self, request):
         """Đánh dấu tất cả thông báo của user là đã đọc"""
         qs = self.get_queryset().filter(is_read=False)

@@ -1,15 +1,10 @@
 from rest_framework import serializers
 from discussions import models
 from courses.serializers import TagSerializer
-from users.serializers import UserSerializer
-
-
-
-
-
+from users.serializers import UserSummarySerializer
 
 class CommentSerializer(serializers.ModelSerializer):
-    author = UserSerializer(read_only=True)
+    author = UserSummarySerializer(read_only=True)
 
     class Meta:
         model = models.Comment
@@ -18,18 +13,18 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class AnswerSerializer(serializers.ModelSerializer):
-    author = UserSerializer(read_only=True)
+    author = UserSummarySerializer(read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
 
     class Meta:
         model = models.Answer
-        fields = ["id", "body", "author", "score", "is_accepted", "question", "comments", "created_at", "updated_at"]
-        read_only_fields = ["id", "score", "is_accepted", "created_at", "updated_at"]
+        fields = ["id", "body", "author", "score", "question", "comments", "created_at", "updated_at"]
+        read_only_fields = ["id", "score", "created_at", "updated_at"]
         ref_name = "DiscussionsAnswer"
 
 
 class QuestionSerializer(serializers.ModelSerializer):
-    author = UserSerializer(read_only=True)
+    author = UserSummarySerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
     answers = AnswerSerializer(many=True, read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
@@ -54,9 +49,15 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 
 class VoteSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    user = UserSummarySerializer(read_only=True)
+    score = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Vote
-        fields = ["id", "user", "content_type", "value"]
-        read_only_fields = ["id"]
+        fields = ["id", "user", "content_type", "value", "object_id","score"]
+        read_only_fields = ["id", "user", "score"]
+
+    def get_score(self, obj):
+        if obj.content_object:
+            return obj.content_object.score
+        return 0

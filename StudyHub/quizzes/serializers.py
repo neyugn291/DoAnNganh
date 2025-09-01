@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from quizzes import models
+from users.serializers import UserSummarySerializer
 
 
 class ChoiceSerializer(serializers.ModelSerializer):
@@ -24,45 +25,44 @@ class QuizSerializer(serializers.ModelSerializer):
         model = models.Quiz
         fields = ["id", "title", "description", "duration", "is_practice", "questions"]
 
+    def create(self, validated_data):
+        questions_data = validated_data.pop('questions')
+        quiz = models.Quiz.objects.create(**validated_data)
+        for q_data in questions_data:
+            choices_data = q_data.pop('choices')
+            question = models.Question.objects.create(quiz=quiz, **q_data)
+            for c_data in choices_data:
+                models.Choice.objects.create(question=question, **c_data)
+        return quiz
 
 class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Answer
-        fields = ["id", "question", "choice"]
+        fields = ["question", "choice"]
         ref_name = "QuizzesAnswer"
 
 
 class SubmissionSerializer(serializers.ModelSerializer):
     answers = AnswerSerializer(many=True)
+    user = UserSummarySerializer(read_only=True)
+    quiz = QuizSerializer(read_only=True)
 
     class Meta:
         model = models.Submission
         fields = ["id", "quiz", "user", "score", "submitted_at", "answers"]
         read_only_fields = ["user", "score", "submitted_at"]
 
+
+
+
     def create(self, validated_data):
-        answers_data = validated_data.pop("answers")
-        user = self.context["request"].user
+        answers_data = validated_data.pop('answers')
+        user = self.context['request'].user
         submission = models.Submission.objects.create(user=user, **validated_data)
-
-        score = 0
-        total_points = 0
-
         for answer_data in answers_data:
-            question = answer_data["question"]
-            choice = answer_data["choice"]
-
-            # lưu answer
-            ans = models.Answer.objects.create(
-                submission=submission, question=question, choice=choice
-            )
-
-            # cộng điểm nếu đúng
-            total_points += question.points
-            if choice.is_correct:
-                score += question.points
-
-        # lưu điểm cuối cùng
-        submission.score = score
+            submission.answers.create(**answer_data)
+        submission.score = sum(a.choice.is_correct * a.question.points for a in submission.answers.all())
         submission.save()
         return submission
+
+

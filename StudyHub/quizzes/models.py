@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth import get_user_model
 
@@ -12,7 +13,6 @@ class Quiz(BaseModel):
     duration = models.PositiveIntegerField(help_text="Thời gian làm bài (phút)")
     is_practice = models.BooleanField(default=False, help_text="True nếu là chế độ ôn tập / thi thử")
 
-
     def __str__(self):
         return self.title
 
@@ -26,6 +26,7 @@ class Question(models.Model):
         return f"{self.quiz.title} - {self.text[:50]}"
 
 
+
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="choices")
     text = models.CharField(max_length=255)
@@ -33,6 +34,14 @@ class Choice(models.Model):
 
     def __str__(self):
         return f"{self.text} ({'Đúng' if self.is_correct else 'Sai'})"
+
+    def save(self, *args, **kwargs):
+        if self.is_correct:
+            # Đảm bảo chỉ có 1 choice đúng
+            self.question.choices.filter(is_correct=True).update(is_correct=False)
+        super().save(*args, **kwargs)
+
+
 
 
 class Submission(models.Model):

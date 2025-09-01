@@ -1,14 +1,14 @@
 from rest_framework import serializers
 from .models import Notification
 from django.contrib.auth import get_user_model
-from users.serializers import UserSerializer
+from users.serializers import UserSerializer, UserSummarySerializer
 
 User = get_user_model()
 
 
 class NotificationSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-    actor = UserSerializer(read_only=True)
+    user = UserSummarySerializer(read_only=True)
+    actor = UserSummarySerializer(read_only=True)
     target_ct = serializers.StringRelatedField()  # hiển thị tên model thay vì id
 
     class Meta:

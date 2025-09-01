@@ -5,6 +5,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Apis, { authApis, endpoints } from "../../configs/Apis";
 import { MyDispatchContext } from "../../configs/MyContexts";
 import { useNavigation } from "@react-navigation/native";
+import LoginStyles from "./Style";
+
+
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(true);
@@ -36,7 +39,11 @@ const Login = () => {
       // Lấy thông tin user với token
       const userData = await authApis(token).get(endpoints["currentUser"]);
 
-      dispatch({ type: "login", payload: userData.data });
+      dispatch({ type: "login", payload: {
+        user: userData.data,
+        token: token,
+      }
+       });
 
       // Điều hướng tùy quyền
     //   if (userData.data.is_superuser) navigation.replace("AdminHome");
@@ -57,22 +64,22 @@ const Login = () => {
   };
 
   return (
-    <View style={myStyles.container}>
-      <View style={myStyles.card}>
-        <Text style={myStyles.title}>Đăng nhập</Text>
-        {error && <Text style={myStyles.errorText}>{error}</Text>}
+    <View style={LoginStyles.container}>
+      <View style={LoginStyles.card}>
+        <Text style={LoginStyles.title}>Đăng nhập</Text>
+        {error && <Text style={LoginStyles.errorText}>{error}</Text>}
 
         <TextInput
-          style={myStyles.input}
+          style={LoginStyles.input}
           placeholder="Tên đăng nhập"
           placeholderTextColor="#999"
           value={username}
           onChangeText={setUsername}
         />
 
-        <View style={myStyles.passwordContainer}>
+        <View style={LoginStyles.passwordContainer}>
           <TextInput
-            style={myStyles.passwordInput}
+            style={LoginStyles.passwordInput}
             placeholder="Mật khẩu"
             placeholderTextColor="#999"
             secureTextEntry={showPassword}
@@ -85,16 +92,16 @@ const Login = () => {
         </View>
 
         <TouchableOpacity
-          style={[myStyles.loginBtn, loading && myStyles.disabledBtn]}
+          style={[LoginStyles.loginBtn, loading && LoginStyles.disabledBtn]}
           onPress={handleLogin}
           disabled={loading}
         >
-          <Text style={myStyles.loginText}>{loading ? "Đang đăng nhập..." : "Đăng nhập"}</Text>
+          <Text style={LoginStyles.loginText}>{loading ? "Đang đăng nhập..." : "Đăng nhập"}</Text>
         </TouchableOpacity>
 
-        <Text style={myStyles.link}>Quên mật khẩu</Text>
+        <Text style={LoginStyles.link}>Quên mật khẩu</Text>
         <TouchableOpacity onPress={() => navigation.navigate("Register")}>
-          <Text style={myStyles.link}>Tạo tài khoản mới</Text>
+          <Text style={LoginStyles.link}>Tạo tài khoản mới</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -102,17 +109,7 @@ const Login = () => {
 };
 
 const myStyles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#6a97a4", justifyContent: "center", alignItems: "center" },
-  card: { width: "80%", backgroundColor: "#f8dad0", borderRadius: 20, padding: 30, alignItems: "center", shadowColor: "#021b42", shadowOffset: { width: 0, height: 5 }, shadowOpacity: 0.7, shadowRadius: 10, elevation: 5 },
-  title: { fontSize: 20, fontWeight: "bold", color: "#174171", marginBottom: 20 },
-  input: { width: "100%", height: 45, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, paddingHorizontal: 12, marginBottom: 15, backgroundColor: "#fff" },
-  passwordContainer: { width: "100%", height: 45, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, flexDirection: "row", alignItems: "center", paddingHorizontal: 12, marginBottom: 15, backgroundColor: "#fff" },
-  passwordInput: { flex: 1, height: "100%", color: "#000" },
-  loginBtn: { width: "100%", height: 45, backgroundColor: "#6a87a4", borderRadius: 8, justifyContent: "center", alignItems: "center", margin: 10 },
-  disabledBtn: { backgroundColor: "#a0a0a0" },
-  loginText: { color: "#fff", fontWeight: "bold", fontSize: 15 },
-  link: { color: "#174171", fontSize: 15, margin: 4 },
-  errorText: { color: "red", fontSize: 14, marginBottom: 10 },
+  
 });
 
 export default Login;

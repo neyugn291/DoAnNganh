@@ -31,8 +31,8 @@ class Notification(models.Model):
 
     url = models.CharField(max_length=512, blank=True, default="")
 
-    target_ct = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    target_id = models.CharField(max_length=64)
+    target_ct = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
+    target_id = models.CharField(max_length=64, null=True, blank=True)
     target = GenericForeignKey("target_ct", "target_id")
 
     is_read = models.BooleanField(default=False)
