@@ -18,6 +18,7 @@ import Resource from './components/Resource/Resource';
 import NotifiDetail from './components/User/NotifiDetail';
 import Quiz from './components/Quiz/Quiz';
 import QuizDetail from './components/Quiz/QuizDetail';
+import ResourceDetail from './components/Resource/ResourceDetail';
 
 const MyUserReducer = (state, action) => {
   switch (action.type) {
@@ -49,6 +50,8 @@ const App = () => {
             <Stack.Screen name="BottomNav" component={BottomNav} />
             <Stack.Screen name="Profile" component={Profile} />
             <Stack.Screen name="Resource" component={Resource} />
+            <Stack.Screen name="ResourceDetail" component={ResourceDetail} />
+
             <Stack.Screen name="Notification" component={Notification} />
             <Stack.Screen name="NotifiDetail" component={NotifiDetail} />
             <Stack.Screen name="Course" component={Course} />

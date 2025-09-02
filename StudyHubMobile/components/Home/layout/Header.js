@@ -7,10 +7,13 @@ import HomeStyles from "../Style";
 import { MyUserContext } from "../../../configs/MyContexts";
 import { useNavigation } from "@react-navigation/native";
 
-const Header =() => {
+const Header = () => {
     const auth = useContext(MyUserContext);
+    const { token } = useContext(MyUserContext);
     const navigation = useNavigation();
     const userData = auth?.user;
+    const [unreadCount, setUnreadCount] = useState(0);
+
 
     const userFirstName = userData?.username || "Khách";
 
@@ -27,6 +30,19 @@ const Header =() => {
             style={HomeStyles.avatarIcon}
         />
     );
+    useEffect(() => {
+        const fetchUnread = async () => {
+            try {
+                const res = await authApis(token).get(endpoints["notifications"]);
+                const notRead = res.data.filter(n => !n.is_read).length;
+                setUnreadCount(notRead);
+            } catch (err) {
+                console.error("Lỗi lấy thông báo:", err.message);
+            }
+        };
+
+        fetchUnread();
+    }, [token]);
 
     return (
         <View style={[HomeStyles.header, { paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 44 }]}>
@@ -39,13 +55,15 @@ const Header =() => {
                         <Text style={HomeStyles.greetingText}>Chào bạn,</Text>
                         <Text style={HomeStyles.nameText}>{userFirstName}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity 
-                    style={HomeStyles.notification}
-                    onPress={() => navigation.navigate("Notification")}>
+                    <TouchableOpacity
+                        style={HomeStyles.notification}
+                        onPress={() => navigation.navigate("Notification")}>
                         <MaterialCommunityIcons name="bell" size={24} color="#fff" />
-                        <View style={HomeStyles.notificationBadge}>
-                            <Text style={HomeStyles.notificationText}>1</Text>
-                        </View>
+                        {unreadCount > 0 && (
+                            <View style={HomeStyles.notificationBadge}>
+                                <Text style={HomeStyles.notificationText}>{unreadCount}</Text>
+                            </View>
+                        )}
                     </TouchableOpacity>
                 </View>
             )}

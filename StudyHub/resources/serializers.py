@@ -19,23 +19,17 @@ class ResourceSerializer(serializers.ModelSerializer):
     tag_ids = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True, source="tags", write_only=True
     )
+    file_url = serializers.SerializerMethodField()
 
     uploaded_by = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = models.Resource
         fields = [
-            "id",
-            "title",
-            "description",
-            "file",
-            "resource_type",
-            "subject",
-            "subject_id",
-            "tags",
-            "tag_ids",
-            "uploaded_by",
-            "uploaded_at",
+            "id", "title", "description", "code_snippet",
+            "file", "resource_type", "subject", "subject_id",
+            "tags", "tag_ids",
+            "uploaded_by", "uploaded_at", "file_url",
         ]
         read_only_fields = ["id", "uploaded_by", "uploaded_at"]
 
@@ -54,3 +48,8 @@ class ResourceSerializer(serializers.ModelSerializer):
         if tags is not None:
             instance.tags.set(tags)
         return instance
+
+    def get_file_url(self, obj):
+        if obj.file:
+            return obj.file.url
+        return None

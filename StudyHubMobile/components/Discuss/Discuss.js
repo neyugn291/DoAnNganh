@@ -371,7 +371,6 @@ export default function Discuss({ navigation, route }) {
         <View style={DiscussStyles.container}>
             <Header />
             <SafeAreaView style={{ flex: 1 }}>
-
                 <FlatList
                     data={questions}
                     keyExtractor={(item) => item.id.toString()}

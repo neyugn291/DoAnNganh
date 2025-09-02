@@ -27,6 +27,7 @@ class Resource(BaseModel):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
 
+    code_snippet = models.TextField(blank=True, null=True)
     file = CloudinaryField(
         'file',
         resource_type="auto",   #cho phép nhiều loại file (ảnh, pdf, zip, mp4,...)
