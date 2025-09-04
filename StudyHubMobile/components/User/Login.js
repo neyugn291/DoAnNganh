@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -7,7 +7,11 @@ import { MyDispatchContext } from "../../configs/MyContexts";
 import { useNavigation } from "@react-navigation/native";
 import LoginStyles from "./Style";
 
+import * as WebBrowser from "expo-web-browser";
+import * as Google from "expo-auth-session/providers/google";
+import { makeRedirectUri } from "expo-auth-session";
 
+WebBrowser.maybeCompleteAuthSession(); // Bắt buộc cho Expo Go
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(true);
@@ -17,6 +21,42 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useContext(MyDispatchContext);
   const navigation = useNavigation();
+
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+    clientId: "954414019449-itomk5offlnuengqf2qe2fuog8l0klhp.apps.googleusercontent.com",
+    redirectUri: "https://auth.expo.io/@neyugn/StudyHubMobile",
+  });
+  console.log(makeRedirectUri({ useProxy: true }))
+  useEffect(() => {
+    if (response?.type === "success") {
+      const { id_token } = response.params;
+      handleGoogleLogin(id_token);
+    }
+  }, [response]);
+
+  const handleGoogleLogin = async (idToken) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Gửi idToken lên backend Django để nhận JWT
+      const res = await Apis.post(endpoints["loginGoogle"], { token: idToken });
+      const token = res.data.access;
+      await AsyncStorage.setItem("token", token);
+
+      const userData = await authApis(token).get(endpoints["currentUser"]);
+      dispatch({ type: "login", payload: { user: userData.data, token } });
+
+      navigation.replace("Home");
+    } catch (ex) {
+      console.error(ex.response ? ex.response.data : ex.message);
+      setError("Đăng nhập Google thất bại!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
 
   const validate = () => {
     if (!username) { setError("Vui lòng nhập tên đăng nhập!"); return false; }
@@ -39,17 +79,14 @@ const Login = () => {
       // Lấy thông tin user với token
       const userData = await authApis(token).get(endpoints["currentUser"]);
 
-      dispatch({ type: "login", payload: {
-        user: userData.data,
-        token: token,
-      }
-       });
+      dispatch({
+        type: "login", payload: {
+          user: userData.data,
+          token: token,
+        }
+      });
 
-      // Điều hướng tùy quyền
-    //   if (userData.data.is_superuser) navigation.replace("AdminHome");
-    //   else if (userData.data.is_staff) navigation.replace("StaffHome");
-    //   else 
-        navigation.replace("Home");
+      navigation.replace("Home");
 
     } catch (ex) {
       console.error("Lỗi chi tiết:", ex.response ? ex.response.data : ex.message);
@@ -99,6 +136,16 @@ const Login = () => {
           <Text style={LoginStyles.loginText}>{loading ? "Đang đăng nhập..." : "Đăng nhập"}</Text>
         </TouchableOpacity>
 
+        {/* --- Nút Google Sign-In --- */}
+        <TouchableOpacity
+          style={LoginStyles.googleBtn}
+          onPress={() => promptAsync()}
+          disabled={!request || loading}
+        >
+          <Text style={LoginStyles.googleText}>Đăng nhập với Google</Text>
+        </TouchableOpacity>
+
+
         <Text style={LoginStyles.link}>Quên mật khẩu</Text>
         <TouchableOpacity onPress={() => navigation.navigate("Register")}>
           <Text style={LoginStyles.link}>Tạo tài khoản mới</Text>
@@ -109,7 +156,7 @@ const Login = () => {
 };
 
 const myStyles = StyleSheet.create({
-  
+
 });
 
 export default Login;
