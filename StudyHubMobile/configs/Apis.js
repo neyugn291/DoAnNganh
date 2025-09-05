@@ -22,6 +22,7 @@ export const endpoints = {
     'users':'/users/users/',
     'profiles':'/users/profiles/',
     'notifications':'/notifications/notifications/',
+    'userDashboard':'/users/stats',
 
     'login': "/token/",
     'refresh': "/token/refresh/",

@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.views import APIView
 
+from . import dao
 from .models import User, Profile
 from .serializers import UserSerializer, ProfileSerializer
 
@@ -52,3 +53,9 @@ class ProfileViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
+class UserDashboardAPI(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        stats = dao.user_dashboard_stats(request.user)
+        return Response(stats)

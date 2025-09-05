@@ -26,7 +26,6 @@ const Login = () => {
     clientId: "954414019449-itomk5offlnuengqf2qe2fuog8l0klhp.apps.googleusercontent.com",
     redirectUri: "https://auth.expo.io/@neyugn/StudyHubMobile",
   });
-  console.log(makeRedirectUri({ useProxy: true }))
   useEffect(() => {
     if (response?.type === "success") {
       const { id_token } = response.params;

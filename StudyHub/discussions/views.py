@@ -1,5 +1,5 @@
 from rest_framework import viewsets, permissions
-from discussions import models, serializers
+from discussions import models, serializers, dao
 
 from django.contrib.contenttypes.models import ContentType
 from rest_framework import viewsets
@@ -41,7 +41,6 @@ class QuestionViewSet(viewsets.ModelViewSet):
         # Lấy random ID
         random_ids = random.sample(all_ids, min(count, len(all_ids)))
 
-        # Lọc theo ID đã random
         return qs_all.filter(id__in=random_ids)
 
 
@@ -79,13 +78,8 @@ class VoteViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         vote = serializer.save(user=request.user)
 
-        # Cập nhật tổng score cho question/answer
-        obj = vote.content_object
-        obj.score = models.Vote.objects.filter(
-            content_type=vote.content_type,
-            object_id=vote.object_id
-        ).aggregate(total=Sum('value'))['total'] or 0
-        obj.save(update_fields=['score'])  # update gọn hơn
+        score = dao.update_score(vote)
 
-        # Trả về dữ liệu vote + score mới
-        return Response({**serializer.data, "score": obj.score}, status=201)
+        return Response({**serializer.data, "score": score}, status=201)
+
+

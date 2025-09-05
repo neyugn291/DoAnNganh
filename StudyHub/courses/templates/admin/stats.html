@@ -1,6 +1,188 @@
 {% extends "admin/base_site.html" %}
 
 {% block content %}
-    <h1>Thong ke Course</h1>
-    {{ course_stats }}
+  <h1>📊 Thống kê Course</h1>
+    <style>
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr); /* 2 cột */
+      gap: 30px; /* khoảng cách giữa các biểu đồ */
+    }
+    .chart-box {
+      background: #fff;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .chart-box canvas {
+      width: 100% !important;
+      height: auto !important;
+    }
+    #freePaidChart {
+  max-width: 350px;
+  max-height: 350px;
+  margin: auto; /* căn giữa */
+}
+    #revenueChart {
+    width: 100% !important;
+    max-width: 800px; /* tùy chỉnh */
+    height: 400px !important; /* chiều cao cố định */
+    margin: auto;
+}
+  </style>
+
+  <div class="chart-grid">
+    <div class="chart-box">
+      <h2>Theo Category</h2>
+      <canvas id="byCategoryChart"></canvas>
+    </div>
+
+    <div class="chart-box">
+      <h2>Theo Tag</h2>
+      <canvas id="byTagChart"></canvas>
+    </div>
+
+    <div class="chart-box">
+      <h2>Free vs Paid</h2>
+      <canvas id="freePaidChart"></canvas>
+    </div>
+
+    <div class="chart-box">
+      <h2>Top Courses (nhiều học viên nhất)</h2>
+      <canvas id="topCoursesChart"></canvas>
+    </div>
+
+    <div class="chart-box">
+      <h2>Theo tháng</h2>
+      <canvas id="byMonthChart"></canvas>
+    </div>
+
+    <div class="chart-box">
+    <h2>Doanh thu theo khoá học Paid</h2>
+    <canvas id="revenueChart"></canvas>
+  </div>
+
+<div class="chart-box">
+  <h2>Đăng ký học theo tháng</h2>
+  <canvas id="enrollmentMonthChart"></canvas>
+</div>
+  </div>
+
+  <!-- Debug raw JSON -->
+  <h2>Raw data (debug)</h2>
+  <pre>{{ stats|safe }}</pre>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const stats = {{ stats|safe }};
+
+    // 1. By Category
+    new Chart(document.getElementById('byCategoryChart'), {
+      type: 'bar',
+      data: {
+        labels: stats.by_category.map(c => c.name),
+        datasets: [{
+          label: 'Số khoá học',
+          data: stats.by_category.map(c => c.count),
+          backgroundColor: 'rgba(54, 162, 235, 0.6)'
+        }]
+      }
+    });
+
+    // 2. By Tag
+    new Chart(document.getElementById('byTagChart'), {
+      type: 'bar',
+      data: {
+        labels: stats.by_tag.map(t => t.name),
+        datasets: [{
+          label: 'Số khoá học',
+          data: stats.by_tag.map(t => t.count),
+          backgroundColor: 'rgba(255, 206, 86, 0.6)'
+        }]
+      }
+    });
+
+    // 3. Free vs Paid
+    new Chart(document.getElementById('freePaidChart'), {
+  type: 'pie',
+  data: {
+    labels: ['Free', 'Paid'],
+    datasets: [{
+      data: [stats.free_vs_paid.free, stats.free_vs_paid.paid],
+      backgroundColor: ['rgba(75, 192, 192, 0.6)','rgba(255, 99, 132, 0.6)']
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: {
+        position: 'right'
+      }
+    }
+  }
+});
+
+    // 4. Top Courses
+    new Chart(document.getElementById('topCoursesChart'), {
+      type: 'bar',
+      data: {
+        labels: stats.top_courses.map(c => c.title),
+        datasets: [{
+          label: 'Số học viên',
+          data: stats.top_courses.map(c => c.student_count),
+          backgroundColor: 'rgba(153, 102, 255, 0.6)'
+        },]
+      }
+    });
+
+    // 5. By Month
+    new Chart(document.getElementById('byMonthChart'), {
+      type: 'line',
+      data: {
+        labels: stats.by_month.map(m => (m.month ? `${m.month}/${m.year}` : "Unknown")), // ✅ fix label
+        datasets: [{
+          label: 'Số khoá học tạo mới',
+          data: stats.by_month.map(m => m.count),
+          borderColor: 'rgba(255, 159, 64, 0.9)',
+          fill: false
+        }]
+      }
+    });
+
+    // 6. Revenue
+  new Chart(document.getElementById('revenueChart'), {
+  type: 'bar',
+  data: {
+    labels: stats.revenue_per_course.map(c => c.title),
+    datasets: [{
+      label: 'Doanh thu (VNĐ)',
+      data: stats.revenue_per_course.map(c => c.revenue),
+      backgroundColor: 'rgba(255, 99, 132, 0.6)'
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: { y: { beginAtZero: true } }
+  }
+});
+
+  // 7. Enrollment by Month
+  new Chart(document.getElementById('enrollmentMonthChart'), {
+    type: 'line',
+    data: {
+      labels: stats.enrollment_by_month.map(m => `${m.month}/${m.year}`),
+      datasets: [{
+        label: 'Số lượt đăng ký',
+        data: stats.enrollment_by_month.map(m => m.count),
+        borderColor: 'rgba(75, 192, 192, 0.9)',
+        fill: false
+      }]
+    }
+  });
+  </script>
+
 {% endblock %}

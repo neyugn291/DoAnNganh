@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-    Animated,
-    Platform,
-    Text,
-    TouchableOpacity,
-    View,StatusBar,ScrollView, Image
+    Animated, Platform,
+    Text, TouchableOpacity,
+    View, StatusBar,
+    ScrollView, Image,
+    Dimensions
 } from "react-native";
-
+import { LineChart } from "react-native-chart-kit";
 import { Chip } from "react-native-paper";
 import Apis, { authApis, endpoints } from "../../configs/Apis";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -15,10 +15,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "./layout/Header";
 import BottomNav from "./layout/BottomNav";
 
+const screenWidth = Dimensions.get("window").width;
+
 
 export default function Home({ navigation, route }) {
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [dashboardStats, setDashboardStats] = useState(null);
+
     const fadeAnim = useRef(new Animated.Value(0)).current;
 
 
@@ -31,9 +35,11 @@ export default function Home({ navigation, route }) {
                 }
 
                 const response = await authApis(token).get(endpoints["currentUser"]);
-                console.log("Thông tin người dùng:", response.data);
-
                 setUserData(response.data);
+
+                const statsRes = await authApis(token).get(endpoints["userDashboard"]);
+                setDashboardStats(statsRes.data);
+
                 setLoading(false);
             } catch (error) {
                 console.error("Lỗi khi lấy dữ liệu người dùng:", error.message);
@@ -59,45 +65,105 @@ export default function Home({ navigation, route }) {
         ).start();
     }, [fadeAnim]);
 
-    const userFirstName = userData?.username || "Khách";
 
-    const userAvatar = userData?.profile?.avatar ? (
-        <Image
-            source={{ uri: userData.profile.avatar }}
-            style={HomeStyles.avatar}
-            onError={(e) => console.log("Lỗi tải avatar:", e.nativeEvent.error)}
-        />
-    ) : (
-        <MaterialCommunityIcons
-            name="account-circle"
-            size={40}
-            color="#fff"
-            style={HomeStyles.avatarIcon}
-        />
-    );
-
-    const [categories, setCategories] = useState([]);
-    const loadCates = async () => {
-        let res = await Apis.get(endpoints['categories']);
-        setCategories(res.data);
-    }
-    useEffect(() => {
-        loadCates();
-    }, []);
-
-    
+    const chartData = dashboardStats
+        ? {
+            labels: dashboardStats.monthly_stats.map((m) => `${m.month}/${m.year}`),
+            datasets: [
+                {
+                    data: dashboardStats.monthly_stats.map((m) => m.count),
+                    color: () => `rgba(75,192,192,1)`,
+                    strokeWidth: 2
+                }
+            ]
+        }
+        : null;
 
     return (
         <View style={HomeStyles.container}>
             <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
             <ScrollView>
                 <Header />
-                <Text>HELLO</Text>
-                <View>
-                    {categories.map(c => <Chip key={c.id}>{c.name}</Chip>)}
-                </View>
+                {/* Tổng số khóa học đã đăng ký */}
+                {dashboardStats && (
+                    <View style={[HomeStyles.card, { padding: 15, marginVertical: 10 }]}>
+                        <Text style={{ fontWeight: "bold", fontSize: 16 }}>Tổng số khóa học đã đăng ký</Text>
+                        <Text style={{ fontSize: 28, fontWeight: "bold", color: "#4BC0C0", marginTop: 5 }}>
+                            {dashboardStats.total_enrolled}
+                        </Text>
+                    </View>
+                )}
+
+                {/* Khóa học đang theo dõi */}
+                {dashboardStats && (
+                    <View style={[HomeStyles.card, { padding: 15, marginVertical: 10 }]}>
+                        <Text style={{ fontWeight: "bold", fontSize: 16, marginBottom: 10 }}>Khóa học đang theo dõi</Text>
+                        {dashboardStats.enrolled_courses.slice(0, 3).map((c) => (
+                            <View key={c.id} style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
+                                {c.thumbnail ? (
+                                    <Image source={{ uri: c.thumbnail }} style={{ width: 50, height: 50, borderRadius: 5, marginRight: 10 }} />
+                                ) : (
+                                    <MaterialCommunityIcons name="book" size={40} style={{ marginRight: 10 }} />
+                                )}
+                                <View>
+                                    <Text style={{ fontWeight: "bold" }}>{c.title}</Text>
+                                    <Text style={{ color: "#666" }}>
+                                        Đăng ký: {new Date(c.enrolled_at).toLocaleDateString()}
+                                    </Text>
+                                </View>
+                            </View>
+                        ))}
+
+                        {dashboardStats.enrolled_courses.length > 3 && (
+                            <TouchableOpacity
+                                onPress={() => navigation.navigate("EnrolledCourses")} // màn hình danh sách đầy đủ
+                                style={{
+                                    marginTop: 10,
+                                    paddingVertical: 8,
+                                    paddingHorizontal: 12,
+                                    backgroundColor: "#4BC0C0",
+                                    borderRadius: 8,
+                                    alignSelf: "flex-start",
+                                }}
+                            >
+                                <Text style={{ color: "#fff", fontWeight: "bold" }}>Xem thêm</Text>
+                            </TouchableOpacity>
+                        )}
+                    </View>
+                )}
+
+
+                {/* Thống kê 5 tháng gần nhất */}
+                {dashboardStats && chartData && (
+                    <View style={[HomeStyles.card, { padding: 15, marginVertical: 10 }]}>
+                        <Text style={{ fontWeight: "bold", fontSize: 16, marginBottom: 10 }}>
+                            Thống kê đăng ký 5 tháng gần nhất
+                        </Text>
+                        <LineChart
+                            data={chartData}
+                            width={screenWidth}
+                            height={220}
+                            chartConfig={{
+                                backgroundGradientFrom: "#fff",
+                                backgroundGradientTo: "#fff",
+                                decimalPlaces: 0,
+                                color: (opacity = 1) => `rgba(75,192,192,${opacity})`,
+                                labelColor: () => "#333",
+                                style: { borderRadius: 16 },
+                                propsForDots: { r: "4", strokeWidth: "2", stroke: "#4BC0C0" }
+                            }}
+                            style={{ borderRadius: 16 }}
+                        />
+                        {dashboardStats.top_course.title && (
+                            <Text style={{ marginTop: 10, fontWeight: "bold" }}>
+                                Khóa học được đăng ký nhiều nhất: {dashboardStats.top_course.title} ({dashboardStats.top_course.count} lượt)
+                            </Text>
+                        )}
+                    </View>
+                )}
+
             </ScrollView>
             <BottomNav navigation={navigation} route={route} />
-        </View> 
+        </View>
     );
 }

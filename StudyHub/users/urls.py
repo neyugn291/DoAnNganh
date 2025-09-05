@@ -1,10 +1,10 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import UserViewSet, ProfileViewSet
-
+from . import views
 router = DefaultRouter()
-router.register(r'users', UserViewSet)
-router.register(r'profiles', ProfileViewSet)
+router.register(r'users', views.UserViewSet)
+router.register(r'profiles', views.ProfileViewSet)
 urlpatterns = [
     path('', include(router.urls)),
+    path('stats/', views.UserDashboardAPI.as_view(), name='users-stats'),
 ]

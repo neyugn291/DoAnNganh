@@ -55,7 +55,7 @@ class CourseSerializer(serializers.ModelSerializer):
             'id', 'title', 'description', 'thumbnail_url',
             'instructor', 'instructor_name',
             'category', 'category_name',
-            'tags', 'price', 'is_free', 'students',
+            'tags', 'price', 'is_free',
             'modules'
         ]
         read_only_fields = ['id', 'instructor_name', 'category_name']
@@ -67,6 +67,12 @@ class CourseSerializer(serializers.ModelSerializer):
 
 
 
+class EnrollmentSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()     # Hiển thị username
+    course = CourseSerializer(read_only=True)   # Nested serializer
 
+    class Meta:
+        model = models.Enrollment
+        fields = ["id", "user", "course", "enrolled_at"]
 
 

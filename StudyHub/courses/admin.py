@@ -1,10 +1,12 @@
 from django.contrib import admin
 from django.template.response import TemplateResponse
 
-from .models import Category, Course, Tag, Module, Lesson
+from .models import Category, Course, Tag, Module, Lesson, Enrollment
 from django.utils.safestring import mark_safe
 from django.urls import path
 from . import dao
+import json
+
 
 class CourseAppAdminSite(admin.AdminSite):
     site_header = 'Courses Management'
@@ -15,8 +17,19 @@ class CourseAppAdminSite(admin.AdminSite):
         ] + super().get_urls()
 
     def stats_view(self, request):
+        stats = {
+            "by_category": list(dao.count_courses_by_category()),
+            "by_tag": list(dao.count_courses_by_tag()),
+            "free_vs_paid": dao.count_free_vs_paid_courses(),
+            "top_courses": list(dao.top_courses_by_students()),
+            "by_month": list(dao.count_courses_by_month()),
+            "revenue_per_course": list(dao.revenue_per_course()),
+            "enrollment_by_month": list(dao.enrollment_by_month())
+        }
+
+        stats_json = mark_safe(json.dumps(stats))
         return TemplateResponse(request, 'admin/stats.html', {
-            'course_stats':dao.count_courses_by_category()
+            "stats": stats_json
         })
 
 
@@ -43,8 +56,11 @@ class ModuleAdmin(admin.ModelAdmin):
 class TagAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
+
+
 course_admin_site.register(Category, CategoryAdmin)
 course_admin_site.register(Course, CourseAdmin)
 course_admin_site.register(Tag)
 course_admin_site.register(Module, ModuleAdmin)
 course_admin_site.register(Lesson)
+course_admin_site.register(Enrollment)

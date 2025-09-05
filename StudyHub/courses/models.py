@@ -28,8 +28,6 @@ class Course(BaseModel):
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     is_free = models.BooleanField(default=True)
 
-    students = models.ManyToManyField(User, related_name='enrolled_courses', blank=True)
-
     def __str__(self):
         return self.title
 
@@ -59,7 +57,16 @@ class Lesson(models.Model):
     def __str__(self):
         return f"{self.module.title} - {self.title}"
 
+class Enrollment(BaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="enrollments")
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="enrollments")
+    enrolled_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        unique_together = ("user", "course")  # 1 user không thể đăng ký 1 course nhiều lần
+
+    def __str__(self):
+        return f"{self.user} → {self.course}"
 # class Interaction(BaseModel):
 #     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='interactions')
 #     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='interactions')
