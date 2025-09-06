@@ -38,6 +38,8 @@ class User(AbstractUser):
         help_text="Người dùng có bật nhận thông báo không?"
     )
 
+    fcm_token = models.CharField(max_length=255, blank=True, null=True)
+
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email', 'phone_number', 'citizen_id']
 

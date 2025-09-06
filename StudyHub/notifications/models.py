@@ -54,3 +54,19 @@ class Notification(models.Model):
     def __str__(self):
         return f"{self.title} -> {self.user.username}"
 
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+
+        # Chỉ gửi FCM khi tạo mới
+        if is_new and self.user.fcm_token and self.user.notifications_enabled:
+            try:
+                from StudyHub.firebase_admin import send_push_notification
+                send_push_notification(
+                    token=self.user.fcm_token,
+                    title=self.title,
+                    body=self.message or ""
+                )
+                print(f"FCM sent to {self.user.username}")
+            except Exception as e:
+                print("FCM send failed:", e)

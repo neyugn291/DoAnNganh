@@ -1,7 +1,7 @@
 from rest_framework import viewsets, generics, permissions, decorators, response, status
 from .models import Notification
 from .serializers import NotificationSerializer
-
+from StudyHub.firebase_admin import send_push_notification
 
 class NotificationViewSet(viewsets.ViewSet, generics.ListAPIView):
     serializer_class = NotificationSerializer
@@ -15,8 +15,20 @@ class NotificationViewSet(viewsets.ViewSet, generics.ListAPIView):
         return Notification.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        # user nhận thông báo = current user
-        serializer.save(user=self.request.user)
+        # Lưu thông báo vào DB
+        notif = serializer.save(user=self.request.user)
+
+        # Gửi FCM notification nếu user có token
+        if notif.user.fcm_token and notif.user.notifications_enabled:
+            try:
+                send_push_notification(
+                    token=notif.user.fcm_token,
+                    title=notif.title,
+                    body=notif.message or ""
+                )
+                print("Sending FCM to token:", notif.user.fcm_token)
+            except Exception as e:
+                print("FCM send failed:", e)
 
     @decorators.action(detail=True, methods=["get"])
     def get_detail(self, request, pk=None):

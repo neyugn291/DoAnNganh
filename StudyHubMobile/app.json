@@ -3,6 +3,7 @@
     "name": "StudyHubMobile",
     "slug": "StudyHubMobile",
     "version": "1.0.0",
+    "owner": "neyugn",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -28,7 +29,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "c7be78c7-95cb-430c-8e17-181364550fa8"
+        "projectId": "b977d7df-5ba1-455e-a89d-736d1434d53a"
       }
     }
   }

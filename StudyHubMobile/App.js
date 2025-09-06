@@ -3,6 +3,9 @@ import { useReducer } from 'react';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { MyUserContext, MyDispatchContext } from "./configs/MyContexts";
 
+import './components/User/firebase-messaging';
+
+
 import Register from './components/User/Register';
 import Login from './components/User/Login';
 import Home from './components/Home/Home';
@@ -19,6 +22,7 @@ import NotifiDetail from './components/User/NotifiDetail';
 import Quiz from './components/Quiz/Quiz';
 import QuizDetail from './components/Quiz/QuizDetail';
 import ResourceDetail from './components/Resource/ResourceDetail';
+
 
 const MyUserReducer = (state, action) => {
   switch (action.type) {
