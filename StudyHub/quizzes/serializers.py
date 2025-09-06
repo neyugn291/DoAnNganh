@@ -45,7 +45,7 @@ class AnswerSerializer(serializers.ModelSerializer):
 class SubmissionSerializer(serializers.ModelSerializer):
     answers = AnswerSerializer(many=True)
     user = UserSummarySerializer(read_only=True)
-    quiz = QuizSerializer(read_only=True)
+    quiz = serializers.PrimaryKeyRelatedField(queryset=models.Quiz.objects.all())
 
     class Meta:
         model = models.Submission

@@ -358,6 +358,9 @@ export default function Discuss({ navigation, route }) {
                 </View>
 
             </View>
+            {/* --- Render comments của question --- */}
+            {item.comments?.length > 0 &&
+                item.comments.map((comment) => renderComment(comment))}
 
             {/* Render answers của question */}
             {item.answers?.length > 0 &&
