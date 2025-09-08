@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-ps_yppz3z2jy%x0#sm=gdoik3st8(1^!+%r@k_@5*xfx2n)mh5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["*", "doannganh-production.up.railway.app",]
 
 
 # Application definition
@@ -169,3 +169,7 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://doannganh-production.up.railway.app",
+]
