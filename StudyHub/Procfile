@@ -1,1 +1,1 @@
-web: gunicorn StudyHub.wsgi
+web: gunicorn StudyHub.wsgi --bind 0.0.0.0:$PORT
