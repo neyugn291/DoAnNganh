@@ -89,10 +89,12 @@ import os
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('MYSQL_DATABASE', 'studyhubdb'),
+        "NAME": os.environ.get("MYSQL_DATABASE", "railway"),
+        # 'NAME': os.environ.get('MYSQL_DATABASE', 'studyhubdb'),
         'USER': os.environ.get('MYSQL_USER', 'root'),
         'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'Demo@123'),
-        'HOST': os.environ.get('MYSQL_HOST', 'localhost'),
+        # 'HOST': os.environ.get('MYSQL_HOST', 'localhost'),
+        "HOST": os.environ.get("MYSQL_HOST", "mysql.railway.internal"),
         'PORT': int(os.environ.get('MYSQL_PORT', 3306)),
     }
 }
