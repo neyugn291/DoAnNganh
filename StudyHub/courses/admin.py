@@ -53,9 +53,8 @@ class CourseAdmin(admin.ModelAdmin):
 class ModuleAdmin(admin.ModelAdmin):
     list_display = ['id','title', 'order']
 
-class TagAdmin(admin.ModelAdmin):
-    search_fields = ['name']
-
+class EnrollmentAdmin(admin.ModelAdmin):
+    list_display = ['user','course', 'enrolled_at']
 
 
 course_admin_site.register(Category, CategoryAdmin)
@@ -63,4 +62,4 @@ course_admin_site.register(Course, CourseAdmin)
 course_admin_site.register(Tag)
 course_admin_site.register(Module, ModuleAdmin)
 course_admin_site.register(Lesson)
-course_admin_site.register(Enrollment)
+course_admin_site.register(Enrollment,EnrollmentAdmin)

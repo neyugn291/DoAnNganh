@@ -22,10 +22,7 @@ export default function Lesson({ route }) {
 
                 // Chuyển thẳng document_url sang https
                 data.document_url = data.document_url.replace("http://", "https://");
-
                 setLesson(data);
-                console.log(data.document_url);
-
 
             } catch (error) {
                 console.error(error);
@@ -45,7 +42,6 @@ export default function Lesson({ route }) {
             <View style={styles.content}>
                 <Text style={styles.title}>{lesson.title}</Text>
                 <Text style={styles.description}>{lesson.content}</Text>
-                <Text>{lesson.document_url}</Text>
                 {lesson.document_url && (
                         <TouchableOpacity style={ModuleStyles.buttonLinking} onPress={() => Linking.openURL(lesson.document_url)}>
                             <Text style={ModuleStyles.textLinking}>Tải / Mở PDF</Text>

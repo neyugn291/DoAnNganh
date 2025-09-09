@@ -41,6 +41,9 @@ class EnrollmentViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.EnrollmentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
 class CourseStatsAPIView(APIView):
     """
     API trả về tất cả dữ liệu thống kê cho frontend.

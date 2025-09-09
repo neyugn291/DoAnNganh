@@ -68,8 +68,10 @@ class CourseSerializer(serializers.ModelSerializer):
 
 
 class EnrollmentSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()     # Hiển thị username
-    course = CourseSerializer(read_only=True)   # Nested serializer
+    user = serializers.StringRelatedField()
+    course = serializers.PrimaryKeyRelatedField(
+        queryset=models.Course.objects.all()
+    )
 
     class Meta:
         model = models.Enrollment

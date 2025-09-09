@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { View, Text, FlatList, Image, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
-import Apis, { endpoints } from "../../configs/Apis";
+import Apis, { authApis,endpoints } from "../../configs/Apis";
 import Header from "../Home/layout/Header";
 import BottomNav from "../Home/layout/BottomNav";
 import CourseStyles from "./Style";
+import { MyUserContext } from "../../configs/MyContexts";
 
 const PAGE_SIZE = 2;
 
@@ -13,7 +14,24 @@ const Course = ({ navigation, route }) => {
 
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const auth = useContext(MyUserContext);
 
+    const handleRegister = async (courseId) => {
+        try {
+            const res = await authApis(auth.token).post(endpoints["enrollments"], {
+                course: courseId
+            });
+            console.log("Đăng ký thành công:", res.data);
+
+            setCourses(prev =>
+                prev.map(c =>
+                    c.id === courseId ? { ...c, is_enrolled: true } : c
+                )
+            );
+        } catch (error) {
+            console.error("Lỗi đăng ký khóa học:", error.message);
+        }
+    };
 
     useEffect(() => {
         const fetchCourses = async (pageNumber = 1) => {
@@ -22,10 +40,24 @@ const Course = ({ navigation, route }) => {
                     params: { page: pageNumber, page_size: PAGE_SIZE }
                 });
                 setCourses(res.data);
-                const allCourses = res.data; // tất cả khóa học
+                const allCourses = res.data;
+
+                const enrollRes = await authApis(auth.token).get(endpoints["enrollments"]);
+
+                const myUserName = auth.user.username;
+                const enrolledCourseIds = enrollRes.data
+                    .filter(e => e.user === myUserName) // lọc enroll của user hiện tại
+                    .map(e => e.course);
+
+                // Gắn is_enrolled vào danh sách khóa học
+                const updatedCourses = allCourses.map(c => ({
+                    ...c,
+                    is_enrolled: enrolledCourseIds.includes(c.id),
+                }));
+
                 const start = (pageNumber - 1) * PAGE_SIZE;
                 const end = start + PAGE_SIZE;
-                setCourses(allCourses.slice(start, end));
+                setCourses(updatedCourses.slice(start, end));
                 setTotalPages(Math.ceil(allCourses.length / PAGE_SIZE));
             } catch (error) {
                 console.error("Lỗi lấy danh sách khóa học:", error);
@@ -37,7 +69,14 @@ const Course = ({ navigation, route }) => {
     }, [page]);
 
     const renderCourse = ({ item }) => (
-        <TouchableOpacity style={CourseStyles.card} onPress={() => navigation.navigate("Module", { courseId: item.id })}>
+
+        <TouchableOpacity style={CourseStyles.card} onPress={() => {
+            if (item.is_enrolled) {
+                navigation.navigate("Module", { courseId: item.id });
+            } else {
+                alert("Bạn phải đăng ký khóa học trước!");
+            }
+        }}>
             <Image
                 source={{ uri: item.thumbnail_url || item.thumbnail }}
                 style={CourseStyles.courseImage}
@@ -49,8 +88,22 @@ const Course = ({ navigation, route }) => {
                 <Text style={CourseStyles.coursePrice}>
                     {item.is_free ? "Miễn phí" : `${item.price} VND`}
                 </Text>
+                {item.is_enrolled ? (
+                    <View>
+                        <Text style={CourseStyles.registerButtonText}>Đã đăng ký</Text>
+                    </View>
+                ) : (
+                    <TouchableOpacity
+                        style={CourseStyles.registerButton}
+                        onPress={() => handleRegister(item.id)}
+                    >
+                        <Text style={CourseStyles.registerButtonText}>Đăng ký</Text>
+                    </TouchableOpacity>
+                )}
             </View>
         </TouchableOpacity>
+
+
     );
 
     if (loading) return <ActivityIndicator size="large" color="#6A1B9A" style={{ flex: 1, justifyContent: "center" }} />;
