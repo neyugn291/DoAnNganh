@@ -31,7 +31,7 @@ class LessonSerializer(serializers.ModelSerializer):
 
     def get_document_url(self, obj):
         if obj.document:
-            return obj.document.url
+            return obj.document.url.replace("http://", "https://")
         return None
 
 class ModuleSerializer(serializers.ModelSerializer):
@@ -62,7 +62,7 @@ class CourseSerializer(serializers.ModelSerializer):
 
     def get_thumbnail_url(self, obj):
         if obj.thumbnail:
-            return obj.thumbnail.url
+            return obj.thumbnail.url.replace("http://", "https://")
         return None
 
 

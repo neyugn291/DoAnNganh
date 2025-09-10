@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { View, Text, Image, ScrollView, StyleSheet, ActivityIndicator, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator, TextInput, TouchableOpacity } from "react-native";
+import { Image } from "expo-image";
+
 import { MyDispatchContext, MyUserContext } from "../../configs/MyContexts";
 import { authApis, endpoints } from "../../configs/Apis";
 import HomeStyles from "../Home/Style";

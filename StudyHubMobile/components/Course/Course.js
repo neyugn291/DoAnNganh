@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, FlatList, Image, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, FlatList, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
 import Apis, { authApis,endpoints } from "../../configs/Apis";
 import Header from "../Home/layout/Header";
 import BottomNav from "../Home/layout/BottomNav";
 import CourseStyles from "./Style";
 import { MyUserContext } from "../../configs/MyContexts";
+import { Image } from "expo-image";
 
 const PAGE_SIZE = 2;
 
@@ -80,7 +81,7 @@ const Course = ({ navigation, route }) => {
             <Image
                 source={{ uri: item.thumbnail_url || item.thumbnail }}
                 style={CourseStyles.courseImage}
-                resizeMode="cover"
+                contentFit="cover"
             />
             <View style={CourseStyles.cardContent}>
                 <Text style={CourseStyles.courseTitle}>{item.title}</Text>

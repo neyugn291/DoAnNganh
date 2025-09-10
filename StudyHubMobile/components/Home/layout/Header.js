@@ -1,5 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, Image, TouchableOpacity, StatusBar, Platform } from "react-native";
+import { View, Text, TouchableOpacity, StatusBar, Platform } from "react-native";
+import { Image } from "expo-image";
+
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authApis, endpoints } from "../../../configs/Apis";

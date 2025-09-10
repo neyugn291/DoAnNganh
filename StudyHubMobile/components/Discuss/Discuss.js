@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Image, Modal, TextInput, Button, } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Modal, TextInput, Button, } from "react-native";
 import Apis, { authApis, endpoints } from "../../configs/Apis";
+import { Image } from "expo-image";
 
 import Header from "../Home/layout/Header";
 import BottomNav from "../Home/layout/BottomNav";
