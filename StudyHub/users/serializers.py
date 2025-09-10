@@ -52,7 +52,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         rep = super().to_representation(instance)
         # Nếu có avatar thì trả về URL đầy đủ
         if instance.avatar:
-            rep['avatar'] = instance.avatar.url
+            rep['avatar'] = instance.avatar.url.replace("http://", "https://")
         else:
             rep['avatar'] = None
         return rep
