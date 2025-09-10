@@ -14,11 +14,16 @@ const QuizDetail = ({ route, navigation }) => {
     const [showSubmissions, setShowSubmissions] = useState(false);
     const [submissions, setSubmissions] = useState([]);
 
+    const [timeLeft, setTimeLeft] = useState(null);
+    const [submitting, setSubmitting] = useState(false);
+
+
     useEffect(() => {
         const fetchQuiz = async () => {
             try {
                 const res = await authApis(token).get(`${endpoints["quizzes"]}${quizId}/`);
                 setQuiz(res.data);
+                console.log(res.data);
             } catch (error) {
                 console.error(error);
             } finally {
@@ -28,11 +33,39 @@ const QuizDetail = ({ route, navigation }) => {
         fetchQuiz();
     }, [quizId]);
 
+    useEffect(() => {
+        if (quiz?.duration) {
+            setTimeLeft(quiz.duration * 60); // ví dụ: duration tính bằng phút → đổi ra giây
+        }
+    }, [quiz]);
+
+    useEffect(() => {
+        if (timeLeft === null) return;
+        if (timeLeft <= 0) {
+            submitQuiz();
+            return;
+        }
+
+        const timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
+        return () => clearInterval(timer);
+    }, [timeLeft]);
+
+    const formatTime = (seconds) => {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m}:${s < 10 ? "0" : ""}${s}`;
+    };
+
+
+
     const selectChoice = (questionId, choiceId) => {
         setSelectedChoices({ ...selectedChoices, [questionId]: choiceId });
     };
 
     const submitQuiz = async () => {
+        if (submitting) return;
+        setSubmitting(true);
+
         try {
             const payload = {
                 quiz: quiz.id,
@@ -68,10 +101,14 @@ const QuizDetail = ({ route, navigation }) => {
 
     return (
         <ScrollView style={styles.container}>
+            <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 12 }}>
+                Thời gian còn lại: {timeLeft !== null ? formatTime(timeLeft) : "Đang tải..."}
+            </Text>
+
             <Text style={styles.title}>{quiz.title}</Text>
             {quiz.questions.map((q) => (
                 <View key={q.id} style={styles.questionContainer}>
-                    <Text style={styles.questionText}>{q.text}</Text>
+                    <Text style={styles.questionText}>{q.text} - Diem: {q.points}</Text>
                     {q.choices.map((c) => (
                         <TouchableOpacity
                             key={c.id}
@@ -87,8 +124,14 @@ const QuizDetail = ({ route, navigation }) => {
                 </View>
             ))}
 
-            <TouchableOpacity style={styles.submitBtn} onPress={submitQuiz}>
-                <Text style={styles.submitBtnText}>Nộp bài</Text>
+            <TouchableOpacity
+                style={[styles.submitBtn, submitting && { opacity: 0.5 }]}
+                onPress={submitQuiz}
+                disabled={submitting || timeLeft <= 0}
+            >
+                <Text style={styles.submitBtnText}>
+                    {submitting ? "Đang nộp..." : "Nộp bài"}
+                </Text>
             </TouchableOpacity>
             <TouchableOpacity
                 style={[styles.submitBtn, { backgroundColor: "#009688", marginTop: 8 }]}

@@ -17,6 +17,8 @@ export const endpoints = {
     'votes':'/discussions/votes/',
 
     'resources':'/resources/resources/',
+    'subjects':'/resources/subjects/',
+    'tags':'/courses/tags/',
 
     'quizzes':'/quizzes/quizzes/',
     'submissions':'/quizzes/submissions/',

@@ -139,15 +139,8 @@ const Course = ({ navigation, route }) => {
                         </TouchableOpacity>
                     </View>
                 )} />
-
-            <View style={CourseStyles.footerTextPosition}>
-                <TouchableOpacity onPress={() => navigation.navigate('MyCoursesScreen')}>
-                    <Text style={CourseStyles.footerText}>
-                        Xem khóa học của tôi
-                    </Text>
-                </TouchableOpacity>
-            </View>
-            <BottomNav navigation={navigation} route={route} />
+                <BottomNav navigation={navigation} route={route} />
+                
         </View>
     );
 }

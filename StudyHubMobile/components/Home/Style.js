@@ -71,6 +71,58 @@ const HomeStyles = StyleSheet.create({
         height: 40,
         marginRight: 10,
     },
+    allCoursesModalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    allCoursesModalContainer: {
+        width: '90%',
+        maxHeight: '80%',
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        padding: 20,
+    },
+    allCoursesModalTitle: {
+        fontWeight: 'bold',
+        fontSize: 18,
+        marginBottom: 10,
+    },
+    allCoursesItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    allCoursesItemTextContainer: {
+        flex: 1,
+    },
+    courseTitle: {
+        fontWeight: 'bold',
+    },
+    courseDate: {
+        color: '#666',
+    },
+  closeModalBtn: {
+    marginTop: 10,
+    paddingVertical: 10,
+    backgroundColor: "#4BC0C0",
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  closeModalBtnText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+    viewMoreBtnText: {
+        marginTop: 10,
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        backgroundColor: "#4BC0C0",
+        borderRadius: 8,
+        alignSelf: "flex-start",
+    }
 });
 
 export default HomeStyles;

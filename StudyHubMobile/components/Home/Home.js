@@ -4,7 +4,7 @@ import {
     Text, TouchableOpacity,
     View, StatusBar,
     ScrollView, Image,
-    Dimensions
+    Dimensions, Modal
 } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { Chip } from "react-native-paper";
@@ -22,6 +22,7 @@ export default function Home({ navigation, route }) {
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [dashboardStats, setDashboardStats] = useState(null);
+    const [showAllCoursesModal, setShowAllCoursesModal] = useState(false);
 
     const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -98,7 +99,7 @@ export default function Home({ navigation, route }) {
                 {dashboardStats && (
                     <View style={[HomeStyles.card, { padding: 15, marginVertical: 10 }]}>
                         <Text style={{ fontWeight: "bold", fontSize: 16, marginBottom: 10 }}>Khóa học đang theo dõi</Text>
-                        {dashboardStats.enrolled_courses.slice(0, 3).map((c) => (
+                        {dashboardStats.enrolled_courses.slice(0, 2).map((c) => (
                             <View key={c.id} style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
                                 {c.thumbnail ? (
                                     <Image source={{ uri: c.thumbnail }} style={{ width: 50, height: 50, borderRadius: 5, marginRight: 10 }} />
@@ -114,23 +115,50 @@ export default function Home({ navigation, route }) {
                             </View>
                         ))}
 
-                        {dashboardStats.enrolled_courses.length > 3 && (
+                        {dashboardStats.enrolled_courses.length > 2 && (
                             <TouchableOpacity
-                                onPress={() => navigation.navigate("EnrolledCourses")} // màn hình danh sách đầy đủ
-                                style={{
-                                    marginTop: 10,
-                                    paddingVertical: 8,
-                                    paddingHorizontal: 12,
-                                    backgroundColor: "#4BC0C0",
-                                    borderRadius: 8,
-                                    alignSelf: "flex-start",
-                                }}
+                                style={HomeStyles.viewMoreBtn}
+                                onPress={() => setShowAllCoursesModal(true)}
                             >
-                                <Text style={{ color: "#fff", fontWeight: "bold" }}>Xem thêm</Text>
+                                <Text style={HomeStyles.viewMoreBtnText}>Xem thêm</Text>
                             </TouchableOpacity>
                         )}
                     </View>
                 )}
+                <Modal
+                    visible={showAllCoursesModal}
+                    animationType="slide"
+                    transparent={true}
+                >
+                    <View style={HomeStyles.allCoursesModalOverlay}>
+                        <View style={HomeStyles.allCoursesModalContainer}>
+                            <Text style={HomeStyles.allCoursesModalTitle}>Tất cả khóa học</Text>
+                            <ScrollView>
+                                {dashboardStats?.enrolled_courses?.map(c => (
+                                    <View key={c.id} style={HomeStyles.allCoursesItem}>
+                                        {c.thumbnail ? (
+                                            <Image source={{ uri: c.thumbnail }} style={HomeStyles.courseThumb} />
+                                        ) : (
+                                            <MaterialCommunityIcons name="book" size={40} style={HomeStyles.courseThumbIcon} />
+                                        )}
+                                        <View style={HomeStyles.courseInfo}>
+                                            <Text style={HomeStyles.courseTitle}>{c.title}</Text>
+                                            <Text style={HomeStyles.courseDate}>
+                                                Đăng ký: {new Date(c.enrolled_at).toLocaleDateString()}
+                                            </Text>
+                                        </View>
+                                    </View>
+                                ))}
+                            </ScrollView>
+                            <TouchableOpacity
+                                style={HomeStyles.closeModalBtn}
+                                onPress={() => setShowAllCoursesModal(false)}
+                            >
+                                <Text style={HomeStyles.closeModalBtnText}>Đóng</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
 
 
                 {/* Thống kê 5 tháng gần nhất */}

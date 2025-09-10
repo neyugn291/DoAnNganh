@@ -26,6 +26,7 @@ class Question(BaseModel):
     score = models.IntegerField(default=0)
     views = models.PositiveIntegerField(default=0)
     comments = GenericRelation(Comment)
+    votes = GenericRelation('Vote')
 
     def __str__(self):
         return self.title
@@ -37,6 +38,7 @@ class Answer(BaseModel):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="answers")
     score = models.IntegerField(default=0)
     comments = GenericRelation(Comment)
+    votes = GenericRelation('Vote')
 
     def __str__(self):
         return f"Answer by {self.author} on {self.question}"
