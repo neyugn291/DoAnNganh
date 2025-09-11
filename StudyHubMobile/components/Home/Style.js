@@ -81,7 +81,7 @@ const HomeStyles = StyleSheet.create({
         width: '90%',
         maxHeight: '80%',
         backgroundColor: '#fff',
-        borderRadius: 16,
+        borderRadius: 15,
         padding: 20,
     },
     allCoursesModalTitle: {
