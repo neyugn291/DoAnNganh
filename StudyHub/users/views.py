@@ -1,7 +1,9 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
-from rest_framework.exceptions import PermissionDenied
+from django.conf import settings
 from rest_framework.views import APIView
+from django.core.mail import send_mail
+import jwt, datetime
 
 from . import dao
 from .models import User, Profile
@@ -59,3 +61,54 @@ class UserDashboardAPI(APIView):
     def get(self, request):
         stats = dao.user_dashboard_stats(request.user)
         return Response(stats)
+
+
+class ForgotPasswordView(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+        if not email:
+            return Response({"detail": "Email không được để trống"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"detail": "Email không tồn tại"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Tạo token JWT đặt lại mật khẩu
+        payload = {
+            "user_id": user.id,
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+        }
+        token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
+
+        reset_link = f"studyhub://reset-password?token={token}"
+
+        send_mail(
+            "Đặt lại mật khẩu",
+            f"Click vào link để đặt lại mật khẩu: {reset_link}",
+            "noreply@studyhub.com",
+            [email],
+            fail_silently=False,
+        )
+        return Response({"detail": "Email đã được gửi"}, status=status.HTTP_200_OK)
+
+class ResetPasswordView(APIView):
+    def post(self, request):
+        token = request.data.get("token")
+        new_password = request.data.get("new_password")
+
+        if not token or not new_password:
+            return Response({"detail": "Token và mật khẩu mới là bắt buộc"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+            user_id = payload.get("user_id")
+            user = User.objects.get(id=user_id)
+        except jwt.ExpiredSignatureError:
+            return Response({"detail": "Token đã hết hạn"}, status=status.HTTP_400_BAD_REQUEST)
+        except (jwt.InvalidTokenError, User.DoesNotExist):
+            return Response({"detail": "Token không hợp lệ"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        user.save()
+        return Response({"detail": "Đổi mật khẩu thành công"}, status=status.HTTP_200_OK)

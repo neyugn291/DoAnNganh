@@ -11,8 +11,7 @@ import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import { makeRedirectUri } from "expo-auth-session";
 
-WebBrowser.maybeCompleteAuthSession(); // Bắt buộc cho Expo Go
-
+WebBrowser.maybeCompleteAuthSession();
 const Login = () => {
   const [showPassword, setShowPassword] = useState(true);
   const [username, setUsername] = useState("");
@@ -21,6 +20,10 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useContext(MyDispatchContext);
   const navigation = useNavigation();
+
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [email, setEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
 
   const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
     clientId: "954414019449-itomk5offlnuengqf2qe2fuog8l0klhp.apps.googleusercontent.com",
@@ -99,6 +102,22 @@ const Login = () => {
     }
   };
 
+  const handleSendForgotEmail = async () => {
+    if (!email) { Alert.alert("Lỗi", "Vui lòng nhập email"); return; }
+    setForgotLoading(true);
+    try {
+      await Apis.post(endpoints["forgotPassword"], { email });
+      Alert.alert("Thành công", "Email reset mật khẩu đã được gửi. Vui lòng kiểm tra hộp thư.");
+      setEmail("");
+      setShowForgotModal(false);
+    } catch (error) {
+      console.error(error.response?.data || error.message);
+      Alert.alert("Lỗi", "Gửi email thất bại. Vui lòng thử lại.");
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
   return (
     <View style={LoginStyles.container}>
       <View style={LoginStyles.card}>
@@ -144,18 +163,58 @@ const Login = () => {
           <Text style={LoginStyles.googleText}>Đăng nhập với Google</Text>
         </TouchableOpacity>
 
-
-        <Text style={LoginStyles.link}>Quên mật khẩu</Text>
+        <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
+          <Text style={LoginStyles.link}>Quên mật khẩu?</Text>
+        </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate("Register")}>
           <Text style={LoginStyles.link}>Tạo tài khoản mới</Text>
         </TouchableOpacity>
       </View>
+      <Modal
+        visible={showForgotModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowForgotModal(false)}
+      >
+        <View style={modalStyles.overlay}>
+          <View style={modalStyles.container}>
+            <Text style={modalStyles.title}>Quên mật khẩu</Text>
+            <TextInput
+              style={modalStyles.input}
+              placeholder="Nhập email của bạn"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
+            />
+            <TouchableOpacity
+              style={[modalStyles.btn, forgotLoading && modalStyles.disabledBtn]}
+              onPress={handleSendForgotEmail}
+              disabled={forgotLoading}
+            >
+              <Text style={modalStyles.btnText}>{forgotLoading ? "Đang gửi..." : "Gửi email"}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setShowForgotModal(false)}>
+              <Text style={modalStyles.cancelText}>Hủy</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
 
-const myStyles = StyleSheet.create({
 
+const modalStyles = StyleSheet.create({
+  overlay: { flex:1, backgroundColor:"rgba(0,0,0,0.5)", justifyContent:"center", padding:20 },
+  container: { backgroundColor:"#fff", borderRadius:8, padding:20 },
+  title: { fontSize:20, marginBottom:15, textAlign:"center" },
+  input: { borderWidth:1, borderColor:"#ccc", borderRadius:8, padding:10, marginBottom:15 },
+  btn: { backgroundColor:"#007bff", padding:12, borderRadius:8, alignItems:"center" },
+  disabledBtn: { backgroundColor:"#aaa" },
+  btnText: { color:"#fff", fontWeight:"bold" },
+  cancelText: { color:"#007bff", marginTop:10, textAlign:"center" },
 });
+
 
 export default Login;

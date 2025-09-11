@@ -86,6 +86,10 @@ WSGI_APPLICATION = 'StudyHub.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 DATABASES = {
     'default': {
@@ -161,6 +165,16 @@ cloudinary.config(
     api_key = '591363178267761',
     api_secret = 'wJjEU-Oq-vGf5fWSkbfdQ7pWM00'
 )
+
+# Cấu hình email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('EMAIL_USER', 'dhnguyen243@gmail.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', 'zvhi uamx kbcw vbtu')
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (

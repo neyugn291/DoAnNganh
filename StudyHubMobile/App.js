@@ -23,7 +23,21 @@ import Quiz from './components/Quiz/Quiz';
 import QuizDetail from './components/Quiz/QuizDetail';
 import ResourceDetail from './components/Resource/ResourceDetail';
 import AddResource from './components/Resource/AddResource';
+import ResetPassword from './components/User/ResetPassword';
 
+const linking = {
+  prefixes: ['studyhub://', 'https://studyhub.com'], // link có thể mở app
+  config: {
+    screens: {
+      ResetPassword: 'reset-password', // route ResetPassword
+      Login: 'Login',
+      Register: 'Register',
+      Home: 'Home',
+      Profile: 'Profile',
+      // các màn hình khác
+    },
+  },
+}
 
 const MyUserReducer = (state, action) => {
   switch (action.type) {
@@ -50,6 +64,7 @@ const App = () => {
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Register" component={Register} />
+            <Stack.Screen name="ResetPassword" component={ResetPassword} />
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="Header" component={Header} />
             <Stack.Screen name="BottomNav" component={BottomNav} />
