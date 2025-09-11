@@ -173,8 +173,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_USER', 'dhnguyen243@gmail.com')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', 'zvhi uamx kbcw vbtu')
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
+DEFAULT_FROM_EMAIL = 'noreply@studyhub.com'
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
