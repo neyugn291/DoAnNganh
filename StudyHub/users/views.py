@@ -86,7 +86,7 @@ class ForgotPasswordView(APIView):
         send_mail(
             "Đặt lại mật khẩu",
             f"Click vào link để đặt lại mật khẩu: {reset_link}",
-            settings.DEFAULT_FROM_EMAIL,
+            "dhnguyen243@gmail.com",
             [email],
             fail_silently=False,
         )
