@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Apis, { authApis, endpoints } from "../../configs/Apis";
@@ -59,7 +59,6 @@ const Login = () => {
   };
 
 
-
   const validate = () => {
     if (!username) { setError("Vui lòng nhập tên đăng nhập!"); return false; }
     if (!password) { setError("Vui lòng nhập mật khẩu!"); return false; }
@@ -106,7 +105,7 @@ const Login = () => {
     if (!email) { Alert.alert("Lỗi", "Vui lòng nhập email"); return; }
     setForgotLoading(true);
     try {
-      await Apis.post(endpoints["forgotPassword"], { email });
+      await Apis.post(endpoints["forgot_password"], { email });
       Alert.alert("Thành công", "Email reset mật khẩu đã được gửi. Vui lòng kiểm tra hộp thư.");
       setEmail("");
       setShowForgotModal(false);
@@ -163,7 +162,7 @@ const Login = () => {
           <Text style={LoginStyles.googleText}>Đăng nhập với Google</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
+        <TouchableOpacity onPress={() => setShowForgotModal(true)}>
           <Text style={LoginStyles.link}>Quên mật khẩu?</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate("Register")}>
@@ -206,14 +205,14 @@ const Login = () => {
 
 
 const modalStyles = StyleSheet.create({
-  overlay: { flex:1, backgroundColor:"rgba(0,0,0,0.5)", justifyContent:"center", padding:20 },
-  container: { backgroundColor:"#fff", borderRadius:8, padding:20 },
-  title: { fontSize:20, marginBottom:15, textAlign:"center" },
-  input: { borderWidth:1, borderColor:"#ccc", borderRadius:8, padding:10, marginBottom:15 },
-  btn: { backgroundColor:"#007bff", padding:12, borderRadius:8, alignItems:"center" },
-  disabledBtn: { backgroundColor:"#aaa" },
-  btnText: { color:"#fff", fontWeight:"bold" },
-  cancelText: { color:"#007bff", marginTop:10, textAlign:"center" },
+  overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center", padding: 20 },
+  container: { backgroundColor: "#fff", borderRadius: 8, padding: 20 },
+  title: { fontSize: 20, marginBottom: 15, textAlign: "center" },
+  input: { borderWidth: 1, borderColor: "#ccc", borderRadius: 8, padding: 10, marginBottom: 15 },
+  btn: { backgroundColor: "#007bff", padding: 12, borderRadius: 8, alignItems: "center" },
+  disabledBtn: { backgroundColor: "#aaa" },
+  btnText: { color: "#fff", fontWeight: "bold" },
+  cancelText: { color: "#007bff", marginTop: 10, textAlign: "center" },
 });
 
 

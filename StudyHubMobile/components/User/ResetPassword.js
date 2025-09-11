@@ -1,12 +1,35 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, Alert, Linking } from "react-native";
 import LoginStyles from "./Style";
+import Apis, { endpoints } from "../../configs/Apis";
 
 const ResetPassword = ({ route, navigation }) => {
-  const { token } = route.params || {};
+  // Nếu có token từ route.params thì dùng, nếu không thì sẽ lấy từ deep link
+  const [token, setToken] = useState(route.params?.token || "");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Hàm xử lý deep link
+    const handleDeepLink = (event) => {
+      const url = event.url;
+      if (url) {
+        const tokenParam = url.split("token=")[1];
+        if (tokenParam) setToken(tokenParam);
+      }
+    };
+
+    // Lắng nghe sự kiện khi app đang mở
+    const subscription = Linking.addEventListener("url", handleDeepLink);
+
+    // Kiểm tra nếu app được mở từ link (cold start)
+    Linking.getInitialURL().then((url) => {
+      if (url) handleDeepLink({ url });
+    });
+
+    return () => subscription.remove();
+  }, []);
 
   const handleReset = async () => {
     if (!password || !confirmPassword) {
@@ -17,9 +40,14 @@ const ResetPassword = ({ route, navigation }) => {
       Alert.alert("Lỗi", "Mật khẩu xác nhận không khớp");
       return;
     }
+    if (!token) {
+      Alert.alert("Lỗi", "Token không hợp lệ. Vui lòng thử lại từ email.");
+      return;
+    }
+
     setLoading(true);
     try {
-      await Apis.post(endpoints["resetPassword"], { token, new_password: password });
+      await Apis.post(endpoints["reset_password"], { token, new_password: password });
       Alert.alert("Thành công", "Mật khẩu đã được thay đổi. Vui lòng đăng nhập lại.");
       navigation.replace("Login");
     } catch (error) {
@@ -55,7 +83,9 @@ const ResetPassword = ({ route, navigation }) => {
           onPress={handleReset}
           disabled={loading}
         >
-          <Text style={LoginStyles.loginText}>{loading ? "Đang xử lý..." : "Đặt lại mật khẩu"}</Text>
+          <Text style={LoginStyles.loginText}>
+            {loading ? "Đang xử lý..." : "Đặt lại mật khẩu"}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

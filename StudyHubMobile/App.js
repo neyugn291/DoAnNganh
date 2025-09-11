@@ -29,7 +29,7 @@ const linking = {
   prefixes: ['studyhub://', 'https://studyhub.com'], // link có thể mở app
   config: {
     screens: {
-      ResetPassword: 'reset-password', // route ResetPassword
+      ResetPassword: 'reset-password',
       Login: 'Login',
       Register: 'Register',
       Home: 'Home',

@@ -41,6 +41,5 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
 
   if (type === EventType.PRESS) {
     console.log('User pressed notification:', notification);
-    // Bạn có thể điều hướng hoặc xử lý deep link ở đây
   }
 });

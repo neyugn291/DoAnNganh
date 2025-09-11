@@ -28,8 +28,8 @@ export const endpoints = {
     'profiles':'/users/profiles/',
     'notifications':'/notifications/notifications/',
     'userDashboard':'/users/stats',
-    'forgot-password':'forgot-password',
-
+    'forgot_password':'/users/forgot-password/',
+    'reset_password':'/users/reset-password/',
 
     'login': "/token/",
     'refresh': "/token/refresh/",

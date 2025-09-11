@@ -37,7 +37,6 @@ const Resource = ({ navigation, route }) => {
     const fetchResources = async (params = {}) => {
         setLoading(true);
         try {
-            // Dùng URLSearchParams tự build query string
             const searchParams = new URLSearchParams();
             Object.keys(params).forEach((key) => {
                 if (params[key]) searchParams.append(key, params[key]);
