@@ -62,7 +62,8 @@ class UserDashboardAPI(APIView):
         stats = dao.user_dashboard_stats(request.user)
         return Response(stats)
 
-
+import logging
+logger = logging.getLogger(__name__)
 class ForgotPasswordView(APIView):
     def post(self, request):
         email = request.data.get("email")
@@ -83,13 +84,24 @@ class ForgotPasswordView(APIView):
 
         reset_link = f"studyhub://reset-password?token={token}"
 
-        send_mail(
-            "Đặt lại mật khẩu",
-            f"Click vào link để đặt lại mật khẩu: {reset_link}",
-            "dhnguyen243@gmail.com",
-            [email],
-            fail_silently=False,
-        )
+        try:
+            send_mail(
+                "Đặt lại mật khẩu",
+                f"Click vào link để đặt lại mật khẩu: {reset_link}",
+                 settings.DEFAULT_FROM_EMAIL,
+                [email],
+                fail_silently=False,
+            )
+            logger.info(f"Email reset đã gửi đến {email}",  f"{settings.DEFAULT_FROM_EMAIL}")
+        except Exception as e:
+            logger.error(f"Lỗi gửi email: {e}")
+            return Response({"detail": "Không gửi được email"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # send_mail(
+        #     "Đặt lại mật khẩu",
+        #     f"Click vào link để đặt lại mật khẩu: {reset_link}",
+        #     [email],
+        #     fail_silently=False,
+        # )
         return Response({"detail": "Email đã được gửi"}, status=status.HTTP_200_OK)
 
 class ResetPasswordView(APIView):
