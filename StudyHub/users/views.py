@@ -63,7 +63,6 @@ class UserDashboardAPI(APIView):
         return Response(stats)
 
 import logging
-import traceback
 logger = logging.getLogger(__name__)
 
 import sendgrid

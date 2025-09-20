@@ -4,8 +4,8 @@ from . import views
 from .views import ForgotPasswordView
 
 router = DefaultRouter()
-router.register(r'users', views.UserViewSet, basename='user')
-router.register(r'profiles', views.ProfileViewSet, basename='profile')
+router.register(r'users', views.UserViewSet)
+router.register(r'profiles', views.ProfileViewSet)
 urlpatterns = [
     path('', include(router.urls)),
     path('stats/', views.UserDashboardAPI.as_view(), name='users-stats'),
