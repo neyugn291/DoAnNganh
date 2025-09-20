@@ -67,6 +67,32 @@ logger = logging.getLogger(__name__)
 
 import sendgrid
 from sendgrid.helpers.mail import Mail
+from django.http import HttpResponse
+
+def open_app(request):
+    token = request.GET.get("token")
+    if not token:
+        return HttpResponse("Token không hợp lệ", status=400)
+
+    # Redirect sang deep link
+    deep_link = f"studyhub://reset-password?token={token}"
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Mở StudyHub</title>
+        <script>
+          window.location = "{deep_link}";
+        </script>
+      </head>
+      <body>
+        <p>Nếu app không mở tự động, click vào đây: 
+           <a href="{deep_link}">Mở StudyHub</a>
+        </p>
+      </body>
+    </html>
+    """
+    return HttpResponse(html)
 
 def send_reset_email(email, reset_link):
     """Gửi email reset password bằng SendGrid API an toàn"""
@@ -101,7 +127,7 @@ class ForgotPasswordView(APIView):
             "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
         }
         token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
-        reset_link = f"studyhub://reset-password?token={token}"
+        reset_link = f"https://doannganh-production.up.railway.app/open-app/?token={token}"
 
         # Gửi email bất đồng bộ
         threading.Thread(target=send_reset_email, args=(email, reset_link), daemon=True).start()
