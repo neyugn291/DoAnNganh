@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const BASE_URL = "http://192.168.120.39:8000/api";
-// const BASE_URL = "https://doannganh-production.up.railway.app/api";
+// const BASE_URL = "http://192.168.120.39:8000/api";
+const BASE_URL = "https://doannganh-production.up.railway.app/api";
 
 export const endpoints = {
     'categories': '/courses/categories/',

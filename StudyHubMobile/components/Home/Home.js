@@ -102,7 +102,7 @@ export default function Home({ navigation, route }) {
                         {dashboardStats.enrolled_courses.slice(0, 2).map((c) => (
                             <View key={c.id} style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
                                 {c.thumbnail ? (
-                                    <Image source={{ uri: c.thumbnail }} style={{ width: 50, height: 50, borderRadius: 5, marginRight: 10 }} />
+                                    <Image source={{ uri: c.thumbnail_url }} style={{ width: 50, height: 50, borderRadius: 5, marginRight: 10 }} />
                                 ) : (
                                     <MaterialCommunityIcons name="book" size={40} style={{ marginRight: 10 }} />
                                 )}

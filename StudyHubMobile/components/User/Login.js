@@ -26,7 +26,7 @@ const Login = () => {
   const [forgotLoading, setForgotLoading] = useState(false);
 
   const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
-    clientId: "954414019449-itomk5offlnuengqf2qe2fuog8l0klhp.apps.googleusercontent.com",
+    clientId: "954414019449-7ce7a61dogimq217h8lguuvao8aqp7ae.apps.googleusercontent.com",
     redirectUri: "https://auth.expo.io/@neyugn/StudyHubMobile",
   });
   useEffect(() => {

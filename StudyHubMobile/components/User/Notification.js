@@ -136,6 +136,7 @@ const Notification = ({ navigation, route }) => {
     const body = remoteMessage.notification?.body || remoteMessage.data?.body || "";
 
     Alert.alert("Co thong bao moi");
+    console.log("Received FCM in foreground:", remoteMessage);
 
     // Nếu muốn cập nhật state notifications luôn
     setNotifications(prev => [

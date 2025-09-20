@@ -2,6 +2,7 @@
   "expo": {
     "name": "StudyHubMobile",
     "slug": "StudyHubMobile",
+    "scheme":"studyhubmobile",
     "version": "1.0.0",
     "owner": "neyugn",
     "orientation": "portrait",
@@ -22,7 +23,19 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.neyugn.StudyHubMobile"
+      "package": "com.neyugn.StudyHubMobile",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "studyhubmobile",
+              "host": "*"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"

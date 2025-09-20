@@ -67,12 +67,3 @@ class Enrollment(BaseModel):
 
     def __str__(self):
         return f"{self.user} → {self.course}"
-# class Interaction(BaseModel):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='interactions')
-#     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='interactions')
-#
-#     class Meta:
-#         abstract = True
-#
-# class Like(Interaction):
-#     active = models.BooleanField(default=True)

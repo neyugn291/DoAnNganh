@@ -92,7 +92,7 @@ class ForgotPasswordView(APIView):
                 [email],
                 fail_silently=False,
             )
-            logger.info(f"Email reset đã gửi đến {email}",  f"{settings.DEFAULT_FROM_EMAIL}")
+            logger.info(f"Email reset đã gửi đến {email} từ {settings.DEFAULT_FROM_EMAIL}")
         except Exception as e:
             logger.error(f"Lỗi gửi email: {e}")
             return Response({"detail": "Không gửi được email"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
