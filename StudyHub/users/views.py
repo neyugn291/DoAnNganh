@@ -66,19 +66,24 @@ import logging
 import traceback
 logger = logging.getLogger(__name__)
 
-def send_reset_email_thread(email, reset_link):
-    """Gửi email bất đồng bộ"""
+import sendgrid
+from sendgrid.helpers.mail import Mail
+
+def send_reset_email(email, reset_link):
+    """Gửi email reset password bằng SendGrid API"""
     try:
-        send_mail(
-            "Đặt lại mật khẩu",
-            f"Click vào link để đặt lại mật khẩu: {reset_link}",
-            settings.DEFAULT_FROM_EMAIL,
-            [email],
-            fail_silently=False,
+        sg = sendgrid.SendGridAPIClient(api_key=settings.SENDGRID_API_KEY)
+        message = Mail(
+            from_email=settings.DEFAULT_FROM_EMAIL,  # phải là sender đã verified
+            to_emails=email,
+            subject="Đặt lại mật khẩu",
+            html_content=f"<p>Click vào link để đặt lại mật khẩu: <a href='{reset_link}'>{reset_link}</a></p>"
         )
+        sg.send(message)
         logger.info(f"Email reset đã gửi đến {email}")
     except Exception as e:
-        logger.error(f"Lỗi gửi email: {e}")
+        logger.error(f"Lỗi gửi email SendGrid: {e}")
+        raise  # để biết lỗi và trả về HTTP 500
 class ForgotPasswordView(APIView):
     def post(self, request):
         email = request.data.get("email")
@@ -99,7 +104,13 @@ class ForgotPasswordView(APIView):
         reset_link = f"studyhub://reset-password?token={token}"
 
         # Gửi email bất đồng bộ
-        threading.Thread(target=send_reset_email_thread, args=(email, reset_link)).start()
+        try:
+            send_reset_email(email, reset_link)
+        except Exception as e:
+            return Response({
+                "detail": "Không gửi được email",
+                "error": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({"detail": "Email đã được gửi"}, status=status.HTTP_200_OK)
 
