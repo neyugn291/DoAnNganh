@@ -63,7 +63,6 @@ class UserDashboardAPI(APIView):
         return Response(stats)
 
 import logging
-import traceback
 logger = logging.getLogger(__name__)
 
 import sendgrid
@@ -83,7 +82,7 @@ def send_reset_email(email, reset_link):
         logger.info(f"Email reset đã gửi đến {email}")
     except Exception as e:
         logger.error(f"Lỗi gửi email SendGrid: {e}")
-        raise  # để biết lỗi và trả về HTTP 500
+
 class ForgotPasswordView(APIView):
     def post(self, request):
         email = request.data.get("email")
@@ -104,13 +103,7 @@ class ForgotPasswordView(APIView):
         reset_link = f"studyhub://reset-password?token={token}"
 
         # Gửi email bất đồng bộ
-        try:
-            send_reset_email(email, reset_link)
-        except Exception as e:
-            return Response({
-                "detail": "Không gửi được email",
-                "error": str(e)
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        threading.Thread(target=send_reset_email, args=(email, reset_link)).start()
 
         return Response({"detail": "Email đã được gửi"}, status=status.HTTP_200_OK)
 
