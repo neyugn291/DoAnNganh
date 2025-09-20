@@ -11,5 +11,4 @@ urlpatterns = [
     path('stats/', views.UserDashboardAPI.as_view(), name='users-stats'),
     path('forgot-password/', views.ForgotPasswordView.as_view(), name='forgot-password'),
     path('reset-password/', views.ResetPasswordView.as_view(), name='reset-password')
-
 ]

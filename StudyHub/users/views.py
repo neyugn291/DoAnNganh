@@ -63,6 +63,7 @@ class UserDashboardAPI(APIView):
         return Response(stats)
 
 import logging
+import traceback
 logger = logging.getLogger(__name__)
 class ForgotPasswordView(APIView):
     def post(self, request):
@@ -94,14 +95,20 @@ class ForgotPasswordView(APIView):
             )
             logger.info(f"Email reset đã gửi đến {email} từ {settings.DEFAULT_FROM_EMAIL}")
         except Exception as e:
+            error_detail = str(e)
+            stack = traceback.format_exc()
+
+            # In ra console
+            print("==== LỖI GỬI EMAIL ====")
+            print(error_detail)
+            print(stack)  # in stack trace đầy đủ ra terminal
             logger.error(f"Lỗi gửi email: {e}")
-            return Response({"detail": "Không gửi được email"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        # send_mail(
-        #     "Đặt lại mật khẩu",
-        #     f"Click vào link để đặt lại mật khẩu: {reset_link}",
-        #     [email],
-        #     fail_silently=False,
-        # )
+            return Response({
+                "detail": "Không gửi được email",
+                "error": error_detail,
+                "stack": stack
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         return Response({"detail": "Email đã được gửi"}, status=status.HTTP_200_OK)
 
 class ResetPasswordView(APIView):
