@@ -71,7 +71,7 @@ from sendgrid.helpers.mail import Mail
 def send_reset_email(email, reset_link):
     """Gửi email reset password bằng SendGrid API an toàn"""
     try:
-        sg = sendgrid.SendGridAPIClient(api_key=settings.SENDGRID_API_KEY)
+        sg = sendgrid.SendGridAPIClient(api_key=settings.EMAIL_HOST_PASSWORD)
         message = Mail(
             from_email=settings.DEFAULT_FROM_EMAIL,
             to_emails=email,
