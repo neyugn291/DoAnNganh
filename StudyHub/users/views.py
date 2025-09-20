@@ -63,23 +63,25 @@ class UserDashboardAPI(APIView):
         return Response(stats)
 
 import logging
+import traceback
 logger = logging.getLogger(__name__)
 
 import sendgrid
 from sendgrid.helpers.mail import Mail
 
 def send_reset_email(email, reset_link):
-    """Gửi email reset password bằng SendGrid API"""
+    """Gửi email reset password bằng SendGrid API an toàn"""
     try:
         sg = sendgrid.SendGridAPIClient(api_key=settings.SENDGRID_API_KEY)
         message = Mail(
-            from_email=settings.DEFAULT_FROM_EMAIL,  # phải là sender đã verified
+            from_email=settings.DEFAULT_FROM_EMAIL,
             to_emails=email,
             subject="Đặt lại mật khẩu",
             html_content=f"<p>Click vào link để đặt lại mật khẩu: <a href='{reset_link}'>{reset_link}</a></p>"
         )
-        sg.send(message)
-        logger.info(f"Email reset đã gửi đến {email}")
+        response = sg.send(message)
+        if response.status_code != 202:
+            logger.warning(f"SendGrid trả về {response.status_code} cho {email}")
     except Exception as e:
         logger.error(f"Lỗi gửi email SendGrid: {e}")
 
@@ -103,7 +105,7 @@ class ForgotPasswordView(APIView):
         reset_link = f"studyhub://reset-password?token={token}"
 
         # Gửi email bất đồng bộ
-        threading.Thread(target=send_reset_email, args=(email, reset_link)).start()
+        threading.Thread(target=send_reset_email, args=(email, reset_link), daemon=True).start()
 
         return Response({"detail": "Email đã được gửi"}, status=status.HTTP_200_OK)
 
