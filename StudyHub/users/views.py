@@ -4,7 +4,7 @@ from django.conf import settings
 from rest_framework.views import APIView
 from django.core.mail import send_mail
 import jwt, datetime
-
+import threading
 from . import dao
 from .models import User, Profile
 from .serializers import UserSerializer, ProfileSerializer
@@ -65,6 +65,20 @@ class UserDashboardAPI(APIView):
 import logging
 import traceback
 logger = logging.getLogger(__name__)
+
+def send_reset_email_thread(email, reset_link):
+    """Gửi email bất đồng bộ"""
+    try:
+        send_mail(
+            "Đặt lại mật khẩu",
+            f"Click vào link để đặt lại mật khẩu: {reset_link}",
+            settings.DEFAULT_FROM_EMAIL,
+            [email],
+            fail_silently=False,
+        )
+        logger.info(f"Email reset đã gửi đến {email}")
+    except Exception as e:
+        logger.error(f"Lỗi gửi email: {e}")
 class ForgotPasswordView(APIView):
     def post(self, request):
         email = request.data.get("email")
@@ -82,32 +96,10 @@ class ForgotPasswordView(APIView):
             "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
         }
         token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
-
         reset_link = f"studyhub://reset-password?token={token}"
 
-        try:
-            send_mail(
-                "Đặt lại mật khẩu",
-                f"Click vào link để đặt lại mật khẩu: {reset_link}",
-                 settings.DEFAULT_FROM_EMAIL,
-                [email],
-                fail_silently=False,
-            )
-            logger.info(f"Email reset đã gửi đến {email} từ {settings.DEFAULT_FROM_EMAIL}")
-        except Exception as e:
-            error_detail = str(e)
-            stack = traceback.format_exc()
-
-            # In ra console
-            print("==== LỖI GỬI EMAIL ====")
-            print(error_detail)
-            print(stack)  # in stack trace đầy đủ ra terminal
-            logger.error(f"Lỗi gửi email: {e}")
-            return Response({
-                "detail": "Không gửi được email",
-                "error": error_detail,
-                "stack": stack
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # Gửi email bất đồng bộ
+        threading.Thread(target=send_reset_email_thread, args=(email, reset_link)).start()
 
         return Response({"detail": "Email đã được gửi"}, status=status.HTTP_200_OK)
 
