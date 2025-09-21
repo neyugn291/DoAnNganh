@@ -127,7 +127,7 @@ class ForgotPasswordView(APIView):
             "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
         }
         token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
-        reset_link = f"https://doannganh-production.up.railway.app/open-app/?token={token}"
+        reset_link = f"https://doannganh-production.up.railway.app/api/users/open-app/?token={token}"
 
         # Gửi email bất đồng bộ
         threading.Thread(target=send_reset_email, args=(email, reset_link), daemon=True).start()
